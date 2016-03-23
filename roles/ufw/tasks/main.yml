@@ -1,0 +1,20 @@
+---
+# roles/ufw/tasks/main.yml
+
+- name: Allow SSH through firewall
+  ufw: rule=allow port=22 proto=tcp
+
+- name: Allow tcp ports
+  ufw: rule=allow port={{ item }} proto=tcp
+  with_items: "{{ allowed_tcp_ports }}"
+
+- name: Allow udp ports
+  ufw: rule=allow port={{ item }} proto=udp
+  with_items: "{{ allowed_udp_ports }}"
+
+- name: Reject everything else
+  ufw:
+    state=enabled
+    logging=low
+    policy=reject
+

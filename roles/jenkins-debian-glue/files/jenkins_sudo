@@ -1,0 +1,4 @@
+# To allows jenkins-debian-glue to run
+
+jenkins ALL=NOPASSWD: /usr/sbin/cowbuilder, /usr/sbin/chroot
+Defaults env_keep+="DEB_* DIST ARCH"

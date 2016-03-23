@@ -1,0 +1,31 @@
+---
+
+jenkins_owner: jenkins
+jenkins_group: jenkins
+
+jenkins_servicename: jenkins
+
+jenkins_hostname: localhost
+jenkins_http_port: 8080
+jenkins_ajp_port: 9090
+
+jenkins_url_prefix: "/jenkins"
+
+jenkins_init_file: /etc/default/jenkins
+jenkins_cli_jar: /opt/jenkins/jenkins-cli.jar
+jenkins_update_file: /var/lib/jenkins/updates/default.json
+
+jenkins_plugins:
+  - git
+
+jenkins_apache: no
+jenkins_apache_hostname: invalid
+jenkins_apache_proto: http
+jenkins_apache_port: 80
+
+jenkins_apache_basicauth: no
+jenkins_apache_basicauth_path: /opt/jenkins/jenkins.htpass
+jenkins_apache_basicauth_users:
+  - user: jenkins
+    pass: replacethispassword
+

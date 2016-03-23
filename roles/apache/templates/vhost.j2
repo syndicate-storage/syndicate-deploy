@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+
+<VirtualHost {{ item.hostname|default('*') }}:{{ item.port|default('80') }}>
+    ServerAdmin {{ item.adminemail|default('admin@localhost')}}
+    ServerName {{ item.name }} 
+
+    DocumentRoot {{ item.docroot }} 
+    <Directory {{ item.docroot }}>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    CustomLog ${APACHE_LOG_DIR}/access_{{ item.name }}.log combined
+    ErrorLog ${APACHE_LOG_DIR}/error_{{ item.name }}.log
+
+</VirtualHost>

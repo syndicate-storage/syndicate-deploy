@@ -1,0 +1,104 @@
+---
+
+- name: Add key for jenkins apt repo
+  apt_key:
+    data="{{ lookup('file','jenkins-ci.org.key') }}"
+    state=present
+
+- name: Add jenkins apt repo
+  apt_repository:
+    repo="deb http://pkg.jenkins-ci.org/debian-stable binary/"
+    state=present
+
+- name: Install packages for java and jenkins
+  apt:
+    name={{ item }}
+    update_cache=yes
+    cache_valid_time=3600
+    state=installed
+  with_items:
+    - openjdk-7-jdk
+    - jenkins
+
+- name: set URL prefix in Jenkins config
+  lineinfile:
+    dest="{{ jenkins_init_file }}"
+    insertafter="^JENKINS_ARGS="
+    regexp='^JENKINS_ARGS\+=" --prefix='
+    line='JENKINS_ARGS+=" --prefix={{ jenkins_url_prefix }}"'
+  register: jenkins_init_config
+
+- name: Set HTTP port in Jenkins config.
+  lineinfile:
+    dest="{{ jenkins_init_file }}"
+    regexp='^HTTP_PORT='
+    line='HTTP_PORT={{ jenkins_http_port }}'
+  register: jenkins_http_config
+
+- name: Set AJP port in Jenkins config.
+  lineinfile:
+    dest="{{ jenkins_init_file }}"
+    regexp='^AJP_PORT='
+    line='AJP_PORT={{ jenkins_ajp_port }}'
+  register: jenkins_ajp_config
+
+- name: Restart Jenkins on init config changes.
+  service:
+    name=jenkins
+    state=restarted
+  when: jenkins_init_config.changed or jenkins_ajp_config.changed or jenkins_http_config.changed
+
+- name: Make sure Jenkins is running
+  wait_for:
+    host="{{ jenkins_hostname }}"
+    port="{{ jenkins_http_port }}"
+
+- name: Make sure jenkins CLI jar parent folder exits
+  file:
+    dest="{{ jenkins_cli_jar | dirname }}"
+    state=directory
+    mode=0755 owner=root group=root
+
+- name: Get the jenkins CLI jar
+  get_url:
+    url="http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix }}/jnlpJars/jenkins-cli.jar"
+    dest="{{ jenkins_cli_jar }}"
+    mode=0644 owner=root group=root
+
+- name: Install jenkins CLI helper script
+  template:
+    src=jenkins_cli.j2
+    dest=/usr/local/bin/jenkins_cli
+    mode=0755 owner=root group=root
+
+- name: Create updates folder
+  file:
+    path="{{ jenkins_update_file | dirname }}"
+    state=directory
+    mode=0755 owner={{ jenkins_owner }} group={{ jenkins_group }}
+
+- name: Download plugin data
+  get_url:
+    url="https://updates.jenkins-ci.org/update-center.json"
+    dest="{{ jenkins_update_file }}.raw"
+
+- name: Process plugin data
+  shell: sed '1d;$d' {{ jenkins_update_file }}.raw > {{ jenkins_update_file }}
+    creates="{{ jenkins_update_file }}"
+
+- name: Set plugin update data file permissions
+  file:
+    path=/var/lib/jenkins/updates/default.json
+    state=file
+    mode=0644 owner={{ jenkins_owner }} group={{ jenkins_group }}
+
+- name: Install jenkins plugins
+  command: /usr/local/bin/jenkins_cli install-plugin {{ item }}
+    creates="/var/lib/jenkins/plugins/{{ item }}.jpi"
+  with_items: "{{ jenkins_plugins }}"
+  notify: restart-jenkins
+
+- name: Enable Apache Proxy in front of Jenkins
+  when: jenkins_apache
+  include: apache_proxy.yml
+

@@ -1,0 +1,40 @@
+---
+
+- name: Add key for jenkins-debian-glue apt repo
+  apt_key:
+    data="{{ lookup('file','jenkins.grml.org.key') }}"
+    state=present
+
+- name: Add jenkins-debian-glue apt repo
+  apt_repository:
+    repo="{{ item }}"
+    state=present
+  with_items:
+    - "deb http://jenkins.grml.org/debian jenkins-debian-glue-release main"
+    - "deb-src http://jenkins.grml.org/debian jenkins-debian-glue-release main"
+
+- name: Install packages for jenkins-debian-glue
+  apt:
+    name={{ item }}
+    update_cache=yes
+    cache_valid_time=3600
+    state=installed
+  with_items:
+  - jenkins-debian-glue
+  - git-buildpackage
+  - subversion-tools
+  - cowbuilder
+  - reprepro
+
+- name: Add jenkins to sudoers for specific tools
+  copy:
+    src=jenkins_sudo
+    dest=/etc/sudoers.d/jenkins_sudo
+    mode=0440 owner=root group=root
+
+- name: Create repository directory for artifacts
+  file:
+    dest=/srv/repository
+    state=directory
+    mode=0755 owner=jenkins group=jenkins
+

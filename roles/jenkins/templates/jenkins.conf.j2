@@ -1,0 +1,45 @@
+# Apache virtualhost config for jenkins, ajp proxy
+
+{% if apache_ssl_enabled %}
+<VirtualHost {{ jenkins_apache_hostname }}:80 }}>
+    RewriteEngine On
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
+</VirtualHost>
+{% endif %}
+
+
+<VirtualHost {{ jenkins_apache_hostname }}:{{ jenkins_apache_port | default("80") }}>
+{% if apache_ssl_enabled %}
+    SSLEngine on
+    SSLProtocol {{ apache_ssl_protocol }}
+    SSLHonorCipherOrder On
+    SSLCipherSuite {{ apache_ssl_cipher_suite }}
+    SSLCertificateFile {{ apache_ssl_cert_dir }}/{{ apache_ssl_cert_name }}.cer
+    SSLCertificateKeyFile {{ apache_ssl_cert_dir }}/{{ apache_ssl_cert_name }}.key
+    SSLCertificateChainFile  {{ apache_ssl_cert_dir }}/{{ apache_ssl_cert_name }}_chain.cer
+{% endif %}
+    ProxyRequests Off
+    ProxyPreserveHost On
+    AllowEncodedSlashes NoDecode
+    <Proxy *>
+      Order deny,allow
+      Allow from all
+    </Proxy>
+    ProxyPass {{ jenkins_url_prefix }} ajp://{{ jenkins_hostname }}:{{ jenkins_ajp_port }}{{ jenkins_url_prefix }} nocanon
+    ProxyPassReverse {{ jenkins_url_prefix }}/ ajp://{{ jenkins_hostname }}:{{ jenkins_ajp_port }}{{ jenkins_url_prefix }}/
+    RequestHeader unset Authorization 
+    RequestHeader set X-Forwarded-Proto "{{ jenkins_apache_proto }}"
+    RequestHeader set X-Forwarded-Port "{{ jenkins_apache_port  | default("80") }}"
+</VirtualHost>
+
+{% if jenkins_apache_basicauth %}
+<Location {{ jenkins_url_prefix }}>
+    AuthType basic
+    AuthName "Jenkins CI Server"
+    AuthUserFile "{{ jenkins_apache_basicauth_path }}"
+    Require valid-user
+</Location>
+{% endif %}
+
+
+

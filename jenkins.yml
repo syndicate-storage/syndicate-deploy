@@ -1,0 +1,14 @@
+---
+# playbook for jenkins installation
+
+# prep
+- hosts: all
+  become: yes
+  roles:
+    - common-prep
+    - ssh-lockdown
+    - ufw
+    - apache
+    - jenkins
+    - jenkins-debian-glue
+
