@@ -21,7 +21,7 @@
 
 - name: copy over SSL certificates if ssl is enabled
   when: apache_ssl_enabled
-  copy: 
+  copy:
     src="{{ apache_ssl_cert_name }}{{ item }}"
     dest="{{ apache_ssl_cert_dir }}/{{ apache_ssl_cert_name }}{{ item }}"
     owner=root group=ssl-cert mode=0640

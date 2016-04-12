@@ -32,9 +32,36 @@
     dest=/etc/sudoers.d/jenkins_sudo
     mode=0440 owner=root group=root
 
-- name: Create repository directory for artifacts
+- name: Configure jenkins-debian-glue
+  template:
+    src=debian_glue.j2
+    dest=/etc/jenkins/debian_glue
+    mode=0644 owner=root group=root
+
+- name: Copy over gpg signing public key for inter-build trust
+  copy:
+    src={{ site_name }}_pub.gpg
+    mode=0644 owner=root group=root
+    dest={{ item }}
+  with_items:
+    - "/etc/jenkins/{{ site_name }}_pub.gpg"
+    - "{{ apache_sites_dir }}/{{ site_name }}/{{ csr_name }}_pub.gpg"
+
+# may also need to create /srv/repositories or j-d-g will have trouble
+- name: Create web accessible repository directory for artifacts
   file:
-    dest=/srv/repository
+    dest="{{ apache_sites_dir }}/{{ site_name }}/repos"
     state=directory
     mode=0755 owner=jenkins group=jenkins
+
+- name: create basic index.html file with instructions for use of site
+  become: no
+  local_action:
+    command pandoc -s -f markdown -t html5 -o {{ role_path }}/files/index.html {{ role_path }}/files/index.md
+
+- name: copy over index.html file
+  copy:
+    dest="{{ apache_sites_dir }}/{{ site_name }}/index.html"
+    src=index.html
+    mode=0644 owner=root group=root
 

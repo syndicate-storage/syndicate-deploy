@@ -1,0 +1,48 @@
+---
+
+additional_debian_packages: {}
+
+apache_modules:
+  - rewrite
+  - proxy_ajp
+  - headers
+  - ssl
+  - autoindex
+
+apache_ssl_enabled: true
+apache_ssl_cert_name: jenkins_example_domain
+
+allowed_tcp_ports:
+  - 80
+  - 443
+
+jenkins_plugins:
+  - git
+  - copyartifact
+  - ws-cleanup
+  - role-strategy
+  - timestamper
+  - configurationslicing
+  - slack
+  - warnings
+  - github
+  - parameterized-trigger
+  - envinject
+
+jenkins_cli_user: jenkinscli
+jenkins_cli_pass: examplepasscli
+
+jenkins_apache: yes
+jenkins_apache_hostname: jenkins.example.domain
+jenkins_apache_proto: https
+jenkins_apache_port: 443
+
+jenkins_apache_basicauth: no
+jenkins_apache_basicauth_users:
+  - user: jenkins
+    pass: examplepass
+
+jenkins_deb_glue_gpg_key_id: ABC123
+
+jenkins_deb_glue_email: "Jenkins Debian Glue <user@jenkins.example.domain>"
+

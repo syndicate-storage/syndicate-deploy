@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="butler.opencloud.cs.arizona.edu">butler.opencloud.cs.arizona.edu</h1>
+<p>This server provices continuous integration services for the <a href="http://opencloud.us">OpenCloud</a> and <a href="https://github.com/syndicate-storage">Syndicate</a> projects.</p>
+<h2 id="services">Services</h2>
+<ul>
+<li><a href="/jenkins/">Jenkins CI Instance</a></li>
+</ul>
+<h2 id="binary-packages">Binary Packages</h2>
+<p>Currently, Syndicate packages are available for Ubuntu 14.04 LTS. These are autobuilt from the master branch of their respective repos on github, and may be unstable.</p>
+<p>To configure:</p>
+<ol type="1">
+<li><p>Download and the <a href="butler_opencloud_cs_arizona_edu_pub.gpg">butler gpg key</a> which signs all the packages.</p></li>
+<li><p>Install the key with <code>apt-key add butler_opencloud_cs_arizona_edu_pub.gpg</code></p></li>
+<li><p>Add a file named <code>butler.list</code> to your <code>/etc/apt/sources.list.d</code>, with the contents:</p>
+<p><code>deb https://butler.opencloud.cs.arizona.edu/repos/release/syndicate syndicate main</code></p></li>
+<li><p>Run <code>apt-get update</code>, which will fetch the package lists</p></li>
+<li><p>Install syndicate with <code>apt-get install syndicate-core</code></p></li>
+</ol>
+</body>
+</html>

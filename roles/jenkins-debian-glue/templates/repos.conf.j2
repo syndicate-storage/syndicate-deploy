@@ -1,0 +1,26 @@
+# Apache config for serving up debian package repos
+# See https://wiki.debian.org/SettingUpSignedAptRepositoryWithReprepro#Configuring_Apache
+
+<Directory "{{ apache_sites_dir }}/{{ site_name }}/repos/release/*/" >
+        # We want the user to be able to browse the directory manually
+        Options Indexes FollowSymLinks Multiviews
+        Order allow,deny
+        Allow from all
+</Directory>
+
+# This syntax supports several repositories, e.g. one for Debian, one for Ubuntu.
+# Replace * with debian, if you intend to support one distribution only.
+<Directory "{{ apache_sites_dir }}/{{ site_name }}/repos/release/*/db/">
+        Order deny,allow
+        Deny from all
+</Directory>
+
+<Directory "{{ apache_sites_dir }}/{{ site_name }}/repos/release/*/conf/">
+        Order deny,allow
+        Deny from all
+</Directory>
+
+<Directory "{{ apache_sites_dir }}/{{ site_name }}/repos/release/*/incoming/">
+        Order allow,deny
+        Deny from all
+</Directory>

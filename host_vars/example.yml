@@ -1,0 +1,6 @@
+---
+
+site_name: jenkins
+ssl_name: jenkins.example.domain
+csr_name: jenkins_example_domain
+
