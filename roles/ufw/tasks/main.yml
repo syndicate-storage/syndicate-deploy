@@ -12,6 +12,15 @@
   ufw: rule=allow port={{ item }} proto=udp
   with_items: "{{ allowed_udp_ports }}"
 
+- name: Allow local network TCP ports
+  when: "{{ hostvars[ansible_fqdn]['ansible_'~item[1]]['ipv4']['network'] is defined }}"
+  ufw:
+    rule=allow port={{ item[0] }} proto=tcp
+    src="{{ hostvars[ansible_fqdn]['ansible_'~item[1]]['ipv4']['network'] }}/{{ hostvars[ansible_fqdn]['ansible_'~item[1]]['ipv4']['netmask'] }}"
+  with_nested:
+    - "{{ allowed_local_tcp_ports }}"
+    - "{{ ansible_interfaces | map('replace','-','_') | list }}"
+
 - name: Reject everything else
   ufw:
     state=enabled
