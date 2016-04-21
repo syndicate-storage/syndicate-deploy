@@ -28,6 +28,7 @@ jenkins_plugins:
   - github
   - parameterized-trigger
   - envinject
+  - tap
 
 jenkins_cli_user: jenkinscli
 jenkins_cli_pass: examplepasscli
@@ -45,4 +46,7 @@ jenkins_apache_basicauth_users:
 jenkins_deb_glue_gpg_key_id: ABC123
 
 jenkins_deb_glue_email: "Jenkins Debian Glue <user@jenkins.example.domain>"
+
+apt_ssl_sites:
+  - apt.dockerproject.org
 
