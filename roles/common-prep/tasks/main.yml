@@ -22,7 +22,7 @@
   register: reboot-required
 
 - name: Reboot if required
-  when: reboot-required.exists is defined
+  when: reboot-required.stat.exists is defined
   debug: msg="System will reboot"
   notify:
     - restart host
