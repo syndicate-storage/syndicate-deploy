@@ -1,14 +1,15 @@
 ---
 # playbook for jenkins installation
 
-# prep
 - hosts: all
   become: yes
   roles:
     - common-prep
     - ssh-lockdown
     - ufw
+    - apt-cacher-ng
     - apache
     - jenkins
     - jenkins-debian-glue
+    - docker
 

@@ -16,7 +16,7 @@
     insertafter="^# PassThroughPattern"
     regexp="^PassThroughPattern"
     line="PassThroughPattern: ({{ apt_ssl_sites | join(\"|\")}}):443$"'
-  notify: 
+  notify:
     restart apt-cacher-ng
 
 - name: Configure local system to use apt-cacher-ng
