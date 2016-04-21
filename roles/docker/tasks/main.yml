@@ -1,0 +1,45 @@
+---
+# file: roles/docker/tasks/main.yml
+
+# https://docs.docker.com/engine/installation/linux/ubuntulinux/
+- name: Prereqs and SSL support for apt for SSL
+  become: yes
+  apt:
+    name={{ item }}
+    update_cache=yes
+    cache_valid_time=3600
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - python-pip
+
+- name: Trust docker apt key
+  become: yes
+  apt_key:
+    keyserver=pool.sks-keyservers.net
+    id=58118E89F3A912897C070ADBF76221572C52609D
+
+- name: Add docker apt repo
+  become: yes
+  apt_repository:
+    repo="deb https://apt.dockerproject.org/repo ubuntu-trusty main"
+
+- name: Install docker
+  become: yes
+  apt:
+    update_cache=yes
+    cache_valid_time=3600
+    name=docker-engine
+
+- name: Make user part of the Docker group
+  become: yes
+  user:
+    name={{ ansible_user_id }}
+    groups="docker" append=yes
+
+# https://docs.docker.com/compose/install/#install-using-pip
+- name: Install docker-compose from PyPi
+  become: yes
+  pip:
+    name=docker-compose
+
