@@ -7,7 +7,6 @@ jenkins_servicename: jenkins
 
 jenkins_hostname: localhost
 jenkins_http_port: 8080
-jenkins_ajp_port: 9090
 
 jenkins_url_prefix: "/jenkins"
 

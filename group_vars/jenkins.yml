@@ -29,6 +29,7 @@ jenkins_plugins:
   - parameterized-trigger
   - envinject
   - tap
+  - ant
 
 jenkins_cli_user: jenkinscli
 jenkins_cli_pass: examplepasscli

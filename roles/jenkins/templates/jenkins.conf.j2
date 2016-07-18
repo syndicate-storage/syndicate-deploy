@@ -1,4 +1,4 @@
-# Apache virtualhost config for jenkins, ajp proxy
+# Apache virtualhost config for jenkins, http proxy
 
 {% if apache_ssl_enabled %}
 <VirtualHost {{ jenkins_apache_hostname }}:80 >
@@ -25,8 +25,8 @@
     <Proxy *>
        Require all granted
     </Proxy>
-    ProxyPass {{ jenkins_url_prefix }} ajp://{{ jenkins_hostname }}:{{ jenkins_ajp_port }}{{ jenkins_url_prefix }} nocanon
-    ProxyPassReverse {{ jenkins_url_prefix }}/ ajp://{{ jenkins_hostname }}:{{ jenkins_ajp_port }}{{ jenkins_url_prefix }}/
+    ProxyPass {{ jenkins_url_prefix }} http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix }} nocanon
+    ProxyPassReverse {{ jenkins_url_prefix }}/ http://{{ jenkins_hostname }}:{{ jenkins_http_port }}{{ jenkins_url_prefix }}/
     RequestHeader unset Authorization 
     RequestHeader set X-Forwarded-Proto "{{ jenkins_apache_proto }}"
     RequestHeader set X-Forwarded-Port "{{ jenkins_apache_port  | default("80") }}"

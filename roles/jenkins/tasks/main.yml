@@ -19,14 +19,7 @@
   with_items:
     - openjdk-7-jdk
     - jenkins
-
-- name: set URL prefix in Jenkins config
-  lineinfile:
-    dest="{{ jenkins_init_file }}"
-    insertafter="^JENKINS_ARGS="
-    regexp='^JENKINS_ARGS\+=" --prefix='
-    line='JENKINS_ARGS+=" --prefix={{ jenkins_url_prefix }}"'
-  register: jenkins_init_config
+    - ant
 
 - name: Set HTTP port in Jenkins config.
   lineinfile:
@@ -35,18 +28,11 @@
     line='HTTP_PORT={{ jenkins_http_port }}'
   register: jenkins_http_config
 
-- name: Set AJP port in Jenkins config.
-  lineinfile:
-    dest="{{ jenkins_init_file }}"
-    regexp='^AJP_PORT='
-    line='AJP_PORT={{ jenkins_ajp_port }}'
-  register: jenkins_ajp_config
-
 - name: Restart Jenkins on init config changes.
   service:
     name=jenkins
     state=restarted
-  when: jenkins_init_config.changed or jenkins_ajp_config.changed or jenkins_http_config.changed
+  when: jenkins_http_config.changed
 
 - name: Make sure Jenkins is running
   wait_for:

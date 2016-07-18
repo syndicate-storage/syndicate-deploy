@@ -1,4 +1,8 @@
 ---
 
-allowed_tcp_ports: {}
+allowed_tcp_ports:
+  - 22
+
 allowed_udp_ports: {}
+
+allowed_local_tcp_ports: {}

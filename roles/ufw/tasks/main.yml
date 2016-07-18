@@ -5,10 +5,12 @@
   ufw: rule=allow port=22 proto=tcp
 
 - name: Allow tcp ports
+  when: "{{ allowed_tcp_ports | length > 0 }}"
   ufw: rule=allow port={{ item }} proto=tcp
   with_items: "{{ allowed_tcp_ports }}"
 
 - name: Allow udp ports
+  when: "{{ allowed_udp_ports | length > 0 }}"
   ufw: rule=allow port={{ item }} proto=udp
   with_items: "{{ allowed_udp_ports }}"
 

@@ -1,0 +1,71 @@
+---
+# hadoop/tasks/main.yml
+
+- name: Install software with apt
+  apt:
+    name={{ item }}
+    update_cache=yes
+    cache_valid_time=3600
+    state=installed
+  with_items:
+    - openjdk-7-jdk
+
+- name: Make dl_dir
+  file:
+    path: "{{ dl_dir }}"
+    state: directory
+
+- name: Download Hadoop
+  get_url:
+    url: "http://apache.mirror.cdnetworks.com/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz"
+    checksum: "sha256:991dc34ea42a80b236ca46ff5d207107bcc844174df0441777248fdb6d8c9aa0"
+    dest: "{{ dl_dir }}/hadoop-2.7.1.tar.gz"
+  register: hadoop_dl
+
+- name: Make hadoop_dir
+  file:
+    path: "{{ hadoop_dir }}"
+    state: directory
+
+# ansible unarchive fails when using strip-components
+
+- name: Uncompress Hadoop
+  when: hadoop_dl.changed
+  command: "tar -xzf {{ hadoop_dl.dest }} -C {{ hadoop_dir }} --strip-components=1"
+  args:
+    creates: "{{ hadoop_dir }}/share"
+
+- name: Make Hadoop Data Dir
+  file:
+    path: "{{ hadoop_dir }}/hdfs_data"
+    state: directory
+
+- name: Download compiled H-Syndicate.jar from butler
+  get_url:
+    url: "https://butler.opencloud.cs.arizona.edu/jenkins/job/h-syndicate/lastSuccessfulBuild/artifact/dist/H-Syndicate.jar"
+    dest: "{{ hdfs_lib_dir }}/H-Syndicate.jar"
+
+- name: Download hadoop library dependencies
+  get_url:
+    url: "{{ item.url }}"
+    checksum: "{{ item.cksum }}"
+    dest: "{{ hdfs_lib_dir }}/{{ item.url | basename }}"
+  with_items:
+    - url: "http://central.maven.org/maven2/org/apache/commons/commons-collections4/4.0/commons-collections4-4.0.jar"
+      cksum: "sha256:93f8dfcd20831a28d092427723f696bceb70b28e7fb89d7914f14d5ea492ce5a"
+    - url: "http://central.maven.org/maven2/com/google/guava/guava/11.0.2/guava-11.0.2.jar"
+      cksum: "sha256:e144a0ec7f5139c58d4f3729ccfb4240f9c576a1aa43790e4090e09316129ee1"
+    - url: "http://central.maven.org/maven2/org/apache/httpcomponents/httpclient/4.1.1/httpclient-4.1.1.jar"
+      cksum: "sha256:eae526d08a6679bf6ca138d45a0005b20ba6ec4a402788be810970713c8e4751"
+    - url: "http://central.maven.org/maven2/org/apache/httpcomponents/httpcore/4.1.1/httpcore-4.1.1.jar"
+      cksum: "sha256:4c3411ccc3b7dd6079b9c3721a059e610e69173a353efb6e049f93c338d0796d"
+    - url: "http://central.maven.org/maven2/org/codehaus/jackson/jackson-jaxrs/1.5.2/jackson-jaxrs-1.5.2.jar"
+      cksum: "sha256:5e4ea6a42da98f3c7256373578e96b081c48e094e7eae72a9d25662bcac3404f"
+    - url: "http://central.maven.org/maven2/org/codehaus/jackson/jackson-xc/1.5.2/jackson-xc-1.5.2.jar"
+      cksum: "sha256:ba2b5de9fddbed33c67b0372c4f779fea11e61d2b50f6ff961daa5973461ec6b"
+    - url: "http://central.maven.org/maven2/com/sun/jersey/contribs/jersey-apache-client4/1.8/jersey-apache-client4-1.8.jar"
+      cksum: "sha256:a09205e3eac4ab3689ca01616af6664c6e74f0d6f4388efa62856c302584e98c"
+    - url: "http://central.maven.org/maven2/com/sun/jersey/jersey-client/1.8/jersey-client-1.8.jar"
+      cksum: "sha256:a663d591c5ae510c4b28435d6b5016eec7461d4fd0fb9011be1d977ef8a35dec"
+
+

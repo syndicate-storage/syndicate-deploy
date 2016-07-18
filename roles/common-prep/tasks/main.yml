@@ -7,34 +7,45 @@
     update_cache=yes
     cache_valid_time=3600
 
-- name: Install standard packages
-  apt: pkg={{ item }} state=present
-  with_items:
-   - tmux
-   - vim
-
-- name: Install additional packages
-  apt: pkg={{ item }} state=present
-  with_items: "{{ additional_debian_packages }}"
-
-- stat:
+- name: Register if a reboot is required
+  stat:
     path=/var/run/reboot-required
   register: reboot-required
 
 - name: Reboot if required
-  when: reboot-required.stat.exists is defined
+  when: reboot-required.exists is defined
   debug: msg="System will reboot"
   notify:
     - restart host
     - wait for host
+
+- name: Install standard packages
+  apt:
+    pkg={{ item }}
+    state=present
+    update_cache=yes
+    cache_valid_time=3600
+  with_items:
+   - tmux
+   - vim
+
+- name: Remove annoying default editors
+  apt:
+    pkg={{ item }}
+    state=absent
+    update_cache=yes
+    cache_valid_time=3600
+  with_items:
+   - nano
+   - jove
 
 - name: Enable vim syntax highlighting
   lineinfile: dest=/etc/vim/vimrc
     regexp="^\s*syntax on"
     line="syntax on"
 
-- name: Remove nano
-  apt:  pkg={{ item }} state=absent
-  with_items:
-   - nano
+- name: Configure tmux
+  copy:
+    src=tmux.conf
+    dest="{{ ansible_user_dir }}/.tmux.conf"
 
