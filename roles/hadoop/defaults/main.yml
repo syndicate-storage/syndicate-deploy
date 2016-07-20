@@ -3,6 +3,17 @@
 
 dl_dir: /opt/downloads
 
-hadoop_dir: /opt/hadoop
+hadoop_apt_packages:
+  - openjdk-7-jdk
+  - daemon
 
+java_home: /usr/lib/jvm/java-7-openjdk-amd64
+
+# Hadoop config
+hadoop_home: /opt/hadoop
+hadoop_conf_dir: /opt/hadoop/etc/hadoop
+hadoop_pid_dir: /var/run/hadoop
 hdfs_lib_dir: /opt/hadoop/share/hadoop/hdfs/lib
+
+# H-Syndicate
+ug_port: 8888

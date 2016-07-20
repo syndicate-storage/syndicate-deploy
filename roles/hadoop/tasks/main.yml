@@ -1,14 +1,35 @@
 ---
 # hadoop/tasks/main.yml
 
+# https://hadoop.apache.org/docs/r2.7.2/hadoop-project-dist/hadoop-common/SecureMode.html#User_Accounts_for_Hadoop_Daemons
+- name: Create hadoop group
+  group: name=hadoop
+
+- name: Add hadoop users
+  user:
+    name: "{{ item }}"
+    group: "hadoop"
+    comment: "Hadoop {{ item }}"
+    home: "{{ hadoop_home }}"
+  with_items:
+   - hdfs
+   - yarn
+   - mapred
+
+- name: Create hadoop PID directory
+  file:
+    path: "{{ hadoop_pid_dir }}"
+    state: directory
+    group: hadoop
+    mode: 0775
+
 - name: Install software with apt
   apt:
     name={{ item }}
     update_cache=yes
     cache_valid_time=3600
     state=installed
-  with_items:
-    - openjdk-7-jdk
+  with_items: "{{ hadoop_apt_packages }}"
 
 - name: Make dl_dir
   file:
@@ -17,28 +38,34 @@
 
 - name: Download Hadoop
   get_url:
-    url: "http://apache.mirror.cdnetworks.com/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz"
-    checksum: "sha256:991dc34ea42a80b236ca46ff5d207107bcc844174df0441777248fdb6d8c9aa0"
-    dest: "{{ dl_dir }}/hadoop-2.7.1.tar.gz"
+    url: "http://apache.mirrors.pair.com/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz"
+    checksum: "sha256:49ad740f85d27fa39e744eb9e3b1d9442ae63d62720f0aabdae7aa9a718b03f7"
+    dest: "{{ dl_dir }}/hadoop-2.7.2.tar.gz"
   register: hadoop_dl
 
-- name: Make hadoop_dir
+- name: Make hadoop_home
   file:
-    path: "{{ hadoop_dir }}"
+    path: "{{ hadoop_home }}"
     state: directory
+    group: hadoop
 
-# ansible unarchive fails when using strip-components
-
+# ansible unarchive fails when using strip-components, known bug.
 - name: Uncompress Hadoop
   when: hadoop_dl.changed
-  command: "tar -xzf {{ hadoop_dl.dest }} -C {{ hadoop_dir }} --strip-components=1"
+  command: "tar -xzf {{ hadoop_dl.dest }} -C {{ hadoop_home }} --strip-components=1"
   args:
-    creates: "{{ hadoop_dir }}/share"
+    creates: "{{ hadoop_home }}/share"
 
-- name: Make Hadoop Data Dir
+- name: Make Hadoop subdirs
   file:
-    path: "{{ hadoop_dir }}/hdfs_data"
+    path: "{{ hadoop_home }}/{{ item }}"
     state: directory
+    owner: root
+    group: hadoop
+    mode: 0775
+  with_items:
+    - logs
+    - hdfs_data
 
 - name: Download compiled H-Syndicate.jar from butler
   get_url:
@@ -68,4 +95,63 @@
     - url: "http://central.maven.org/maven2/com/sun/jersey/jersey-client/1.8/jersey-client-1.8.jar"
       cksum: "sha256:a663d591c5ae510c4b28435d6b5016eec7461d4fd0fb9011be1d977ef8a35dec"
 
+- name: Template /etc/profile.d config files
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/profile.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - hadoop.sh
+    - java.sh
+
+- name: Template hadoop configuration files
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ hadoop_conf_dir }}/{{ item }}"
+  with_items:
+    - core-site.xml
+    - hdfs-site.xml
+    - mapred-site.xml
+    - yarn-site.xml
+
+- name: Copy over initscripts
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/init.d/{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  with_items:
+    - hadoop-datanode
+    - hadoop-namenode
+    - hadoop-nodemanager
+    - hadoop-resourcemanager
+
+- name: check to see if HDFS has been formatted
+  stat:
+    path: "{{ hadoop_home }}/hdfs_data/name"
+  register: hdfs_dn
+
+- name: Format HDFS on namenode
+  when: "inventory_hostname == groups['namenode'][0] and not hdfs_dn.stat.exists"
+  command: "{{ hadoop_home }}/bin/hadoop namenode -format"
+
+- name: Start hadoop processes on namenode
+  when: "inventory_hostname == groups['namenode'][0]"
+  service:
+    name: "{{ item }}"
+    state: started
+  with_items:
+    - hadoop-namenode
+    - hadoop-resourcemanager
+    - hadoop-nodemanager
+
+- name: Start hadoop processes on datanodes
+  service:
+    name: "{{ item }}"
+    state: started
+  with_items:
+    - hadoop-datanode
 

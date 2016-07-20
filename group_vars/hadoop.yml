@@ -1,0 +1,10 @@
+---
+# see: http://blog.cloudera.com/blog/2009/08/hadoop-default-ports-quick-reference/
+
+allowed_local_tcp_ports:
+  - 8020
+  - 50010
+  - 50020
+  - 50030
+  - 50060
+  - 50070

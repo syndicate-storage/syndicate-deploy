@@ -1,0 +1,7 @@
+export HADOOP_HOME={{ hadoop_home }}
+export HADOOP_PREFIX={{ hadoop_home }}
+export HADOOP_CONF_DIR={{ hadoop_conf_dir }}
+export HADOOP_PID_DIR={{ hadoop_pid_dir }}
+
+# modify path to include hadoop/bin
+export PATH="{{ hadoop_home }}/bin:$PATH"
