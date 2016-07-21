@@ -39,7 +39,7 @@ start() {
   fi
   RETVAL=$?
   echo
-  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/hadoop-datanode
+  [ $RETVAL -eq 0 ] && touch /var/lock/hadoop-datanode
   return $RETVAL
 }
 
@@ -53,7 +53,7 @@ stop() {
   RETVAL=$?
   sleep 5
   echo
-  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/hadoop-datanode $PIDFILE
+  [ $RETVAL -eq 0 ] && rm -f /var/lock/hadoop-datanode $PIDFILE
 }
 
 restart() {
@@ -67,7 +67,7 @@ checkstatus(){
 }
 
 condrestart(){
-  [ -e /var/lock/subsys/hadoop-datanode ] && restart || :
+  [ -e /var/lock/hadoop-datanode ] && restart || :
 }
 
 case "$1" in

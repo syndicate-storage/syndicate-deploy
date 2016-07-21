@@ -23,9 +23,9 @@
 
 source /etc/profile.d/hadoop.sh
 source /etc/profile.d/java.sh
-source /etc/rc.d/init.d/functions
+source /lib/lsb/init-functions
 source ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
-source $HADOOP_HOME/etc/hadoop/yarn-env.sh
+source ${HADOOP_HOME}/etc/hadoop/yarn-env.sh
 
 RETVAL=0
 PIDFILE="${YARN_PID_DIR}/yarn-yarn-proxyserver.pid"
@@ -36,7 +36,7 @@ start() {
   daemon --user yarn $HADOOP_HOME/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" start proxyserver
   RETVAL=$?
   echo
-  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/hadoop-yarn-proxy-server
+  [ $RETVAL -eq 0 ] && touch /var/lock/hadoop-yarn-proxy-server
   return $RETVAL
 }
 
@@ -46,7 +46,7 @@ stop() {
   RETVAL=$?
   sleep 5
   echo
-  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/hadoop-yarn-proxy-server $PIDFILE
+  [ $RETVAL -eq 0 ] && rm -f /var/lock/hadoop-yarn-proxy-server $PIDFILE
 }
 
 checkstatus(){
@@ -60,7 +60,7 @@ restart() {
 }
 
 condrestart(){
-  [ -e /var/lock/subsys/hadoop-yarn-proxy-server ] && restart || :
+  [ -e /var/lock/hadoop-yarn-proxy-server ] && restart || :
 }
 
 case "$1" in

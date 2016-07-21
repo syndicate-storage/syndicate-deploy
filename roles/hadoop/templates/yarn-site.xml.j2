@@ -19,10 +19,18 @@
   </property>
   <property>
     <name>yarn.nodemanager.hostname</name>
-    <value>{{ groups['namenode'][0] }}</value>
+    <value>{{ inventory_hostname }}</value>
   </property>
   <property>
     <name>yarn.resourcemanager.hostname</name>
     <value>{{ groups['namenode'][0] }}</value>
+  </property>
+  <property>
+    <name>yarn.nodemanager.resource.memory-mb</name>
+    <value>{{ (ansible_memtotal_mb * 0.8) | int }}</value>
+  </property>
+  <property>
+    <name>yarn.nodemanager.resource.cpu-vcores</name>
+    <value>{{ ansible_processor_vcpus - 2 }}</value>
   </property>
 </configuration>

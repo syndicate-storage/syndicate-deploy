@@ -36,7 +36,7 @@ start() {
   daemon --user yarn ${HADOOP_HOME}/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" start resourcemanager
   RETVAL=$?
   echo
-  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/hadoop-yarn-resourcemanager
+  [ $RETVAL -eq 0 ] && touch /var/lock/hadoop-yarn-resourcemanager
   return $RETVAL
 }
 
@@ -46,7 +46,7 @@ stop() {
   RETVAL=$?
   sleep 5
   echo
-  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/hadoop-yarn-resourcemanager $PIDFILE
+  [ $RETVAL -eq 0 ] && rm -f /var/lock/hadoop-yarn-resourcemanager $PIDFILE
 }
 
 checkstatus(){
@@ -60,7 +60,7 @@ restart() {
 }
 
 condrestart(){
-  [ -e /var/lock/subsys/hadoop-yarn-resourcemanager ] && restart || :
+  [ -e /var/lock/hadoop-yarn-resourcemanager ] && restart || :
 }
 
 case "$1" in

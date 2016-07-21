@@ -1,10 +1,10 @@
 ---
-# see: http://blog.cloudera.com/blog/2009/08/hadoop-default-ports-quick-reference/
+# see: http://www.cloudera.com/documentation/enterprise/latest/topics/cdh_ig_ports_cdh5.html
 
 allowed_local_tcp_ports:
-  - 8020
-  - 50010
-  - 50020
-  - 50030
-  - 50060
-  - 50070
+  - "8020:8090"
+  - "9000:9001"
+  - 13562
+  - 19888
+  - "30000:49999"
+  - "50010:50495"

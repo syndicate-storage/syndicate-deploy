@@ -1,0 +1,21 @@
+---
+# hadoop/handlers/main.yml
+
+- name: restart-namenode 
+  when: "inventory_hostname == groups['namenode'][0]"
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - hadoop-namenode
+    - hadoop-resourcemanager
+    - hadoop-nodemanager
+
+- name: restart-datanode
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - hadoop-datanode
+    - hadoop-nodemanager
+

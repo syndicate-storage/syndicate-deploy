@@ -23,7 +23,7 @@
 
 source /etc/profile.d/hadoop.sh
 source /etc/profile.d/java.sh
-source /etc/rc.d/init.d/functions
+source /lib/lsb/init-functions
 source ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
 
 RETVAL=0
@@ -35,7 +35,7 @@ start() {
   daemon --user mapred ${HADOOP_HOME}/sbin/mr-jobhistory-daemon.sh --config "${HADOOP_CONF_DIR}" start historyserver
   RETVAL=$?
   echo
-  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/hadoop-historyserver
+  [ $RETVAL -eq 0 ] && touch /var/lock/hadoop-historyserver
   return $RETVAL
 }
 
@@ -45,7 +45,7 @@ stop() {
   RETVAL=$?
   sleep 5
   echo
-  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/hadoop-historyserver $PIDFILE
+  [ $RETVAL -eq 0 ] && rm -f /var/lock/hadoop-historyserver $PIDFILE
 }
 
 restart() {
@@ -59,7 +59,7 @@ checkstatus(){
 }
 
 condrestart(){
-  [ -e /var/lock/subsys/hadoop-historyserver ] && restart || :
+  [ -e /var/lock/hadoop-historyserver ] && restart || :
 }
 
 case "$1" in

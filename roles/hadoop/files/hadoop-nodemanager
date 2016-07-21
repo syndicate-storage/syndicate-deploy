@@ -36,7 +36,7 @@ start() {
   daemon --user yarn ${HADOOP_HOME}/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" start nodemanager
   RETVAL=$?
   echo
-  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/hadoop-yarn-nodemanager
+  [ $RETVAL -eq 0 ] && touch /var/lock/hadoop-yarn-nodemanager
   return $RETVAL
 }
 
@@ -46,7 +46,7 @@ stop() {
   RETVAL=$?
   sleep 5
   echo
-  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/hadoop-yarn-nodemanager $PIDFILE
+  [ $RETVAL -eq 0 ] && rm -f /var/lock/hadoop-yarn-nodemanager $PIDFILE
 }
 
 checkstatus(){
@@ -60,7 +60,7 @@ restart() {
 }
 
 condrestart(){
-  [ -e /var/lock/subsys/hadoop-yarn-nodemanager ] && restart || :
+  [ -e /var/lock/hadoop-yarn-nodemanager ] && restart || :
 }
 
 case "$1" in

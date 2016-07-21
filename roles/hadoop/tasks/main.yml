@@ -115,6 +115,9 @@
     - hdfs-site.xml
     - mapred-site.xml
     - yarn-site.xml
+  notify:
+    - restart-namenode
+    - restart-datanode
 
 - name: Copy over initscripts
   copy:
@@ -154,4 +157,5 @@
     state: started
   with_items:
     - hadoop-datanode
+    - hadoop-nodemanager
 
