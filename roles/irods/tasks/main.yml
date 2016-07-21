@@ -1,0 +1,34 @@
+---
+# irods/tasks/main.yml
+
+- name: Make dl_dir
+  file:
+    path: "{{ dl_dir }}"
+    state: directory
+
+- name: Install iRODS prereqs
+  apt:
+    name={{ item }}
+    update_cache=yes
+    cache_valid_time=3600
+    state=installed
+  with_items:
+    - postgresql-9.3
+    - python-pika
+    - python-psycopg2
+    - uuid-dev
+
+- name: Download iRODS packages
+  get_url:
+    url: "{{ item.url }}"
+    checksum: "{{ item.cksum }}"
+    dest: "{{ dl_dir }}/{{ item.url | basename }}"
+  with_items: "{{ irods_packages }}"
+
+- name: Install iRODS packages
+  apt:
+    deb: "{{ dl_dir }}/{{ item.url | basename  }}"
+    state: installed
+  with_items: "{{ irods_packages }}"
+
+

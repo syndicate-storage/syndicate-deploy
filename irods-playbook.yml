@@ -1,0 +1,9 @@
+---
+# install iRODS
+
+- hosts: irods
+  become: yes
+  roles:
+    - common-prep
+    - ssh-lockdown
+    - irods

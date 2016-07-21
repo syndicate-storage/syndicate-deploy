@@ -1,0 +1,13 @@
+---
+# irods/defaults/main.yml
+
+dl_dir: /opt/downloads
+
+irods_home: /opt/irods
+
+irods_packages:
+  - url: "ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu14/irods-icat-4.1.8-ubuntu14-x86_64.deb"
+    cksum: "sha256:a33567e6563f7f9e024a38a43d7d208da5e053df10dc91eee310d4e057259ac6"
+  - url: "ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu14/irods-database-plugin-postgres-1.8-ubuntu14-x86_64.deb"
+    cksum: "sha256:70a00461dc77519ee1fb71d721e1798b19b21b7bfd1c2ce9d8aaada48bc56738"
+
