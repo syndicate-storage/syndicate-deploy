@@ -1,0 +1,87 @@
+---
+# demo_install/tasks.main
+
+- name: Make directory for POV dataset
+  file:
+    path: "{{ datasets_dir }}/POV"
+    state: directory
+
+- name: Download POV dataset
+  get_url:
+    url: "https://butler.opencloud.cs.arizona.edu/datasets/POV/{{ item.url }}"
+    checksum: "{{ item.cksum }}"
+    dest: "{{ datasets_dir }}/POV/{{ item.url | basename }}"
+  with_items:
+    - url: "POV_GD.Spr.C.8m_reads.fa"
+      cksum: "sha256:d2f4720930128ebf5fb90e08ed9637b96a26a5d9543ed0b06232133b7a0118d0"
+    - url: "POV_GF.Spr.C.9m_reads.fa"
+      cksum: "sha256:5ce88ded0bddf5847a272c2745cc1e015dae4a1bbe3bf14af795f9bc262e8b7c"
+    - url: "POV_L.Spr.C.1000m_reads.fa"
+      cksum: "sha256:c2bff40a0b97017e0fc781cd0f6eec037f612de657af6f9e85a6c79550e50a08"
+    - url: "POV_L.Spr.C.10m_reads.fa"
+      cksum: "sha256:ee3291b071b3858f2b4699a841d4ddd3587d2f783792682da29dfdbbf2e56eaa"
+    - url: "POV_L.Spr.C.1300m_reads.fa"
+      cksum: "sha256:1148fb8e31556adacba0d5811fb559dd37548435f3da78998e27c61c24ce2201"
+    - url: "POV_L.Spr.C.500m_reads.fa"
+      cksum: "sha256:a847adb21eeeccbb6d4bfe3a1fd218ab70cce0a96ea4021f23f6a768ecd5acb4"
+    - url: "POV_L.Spr.I.1000m_reads.fa"
+      cksum: "sha256:057c0382f499eaa82e33e4599d572c87bd0809b990d554946def751ef6ae3e67"
+    - url: "POV_L.Spr.I.10m_reads.fa"
+      cksum: "sha256:b98c32969c46ae5f3a25a234efd5000207a31a9a56172aa9f077598c4ba61c2c"
+    - url: "POV_L.Spr.I.2000m_reads.fa"
+      cksum: "sha256:ac2e66073ecf812b670c5616f04f962f272ff365857f8ce45d1388739f2e070d"
+    - url: "POV_L.Spr.I.500m_reads.fa"
+      cksum: "sha256:44b8c8f9fe1d5d16d1cc8518787910336fc71ace49cc79c6aedbe3094379f3aa"
+    - url: "POV_L.Spr.O.1000m_reads.fa"
+      cksum: "sha256:df4796d2452394a0c6b1296d595348fd7be198e402cff9a7580b3e11f78a1697"
+    - url: "POV_L.Spr.O.10m_reads.fa"
+      cksum: "sha256:405d1cf8bf5dc2ce7af4aaf418df5662bce9bd680352877bf7181dad626485bc"
+    - url: "POV_L.Spr.O.2000m_reads.fa"
+      cksum: "sha256:5ed479ef32ae3ae4b29688f78fe7a911763c8fae199780d75ae0d52db71c609f"
+    - url: "POV_L.Sum.O.1000m_reads.fa"
+      cksum: "sha256:b55b711157719b71fd169b5cb9a99104147a0b6eae9d8bd9bd2ed067eeeb93c7"
+    - url: "POV_L.Sum.O.10m_reads.fa"
+      cksum: "sha256:6f52d33f7050cb8ad875acafa1d343d8605fce085218e65707b33983872894d6"
+    - url: "POV_L.Sum.O.2000m_reads.fa"
+      cksum: "sha256:6edae37630e4ada15a6775c112b6a22b8c6f12ddd4f442e2fc92f99909bbc89a"
+    - url: "POV_L.Sum.O.500m_reads.fa"
+      cksum: "sha256:91cd20c5b13c1546e67c0ee4d055ec20f6b99a65ac9313de8524426900702fe7"
+    - url: "POV_L.Win.O.1000m_reads.fa"
+      cksum: "sha256:595f1a8bbf4edc75c62548f752abc3b8ddc95780eac4a8ec45ed2f91ad570416"
+    - url: "POV_L.Win.O.10m_reads.fa"
+      cksum: "sha256:e5097feff7875a48cd89924ad9c1a76d3255750d0a6e5c6fbc3f76c313d13314"
+    - url: "POV_L.Win.O.2000m_reads.fa"
+      cksum: "sha256:c7dfd46f802670471a320593fb6c891e2dd2f8d6eb41e8fabb9a82cb0b751b98"
+    - url: "POV_L.Win.O.500m_reads.fa"
+      cksum: "sha256:afc01a52e79e6a32624d7ab375d6a41128403ac0916f83122e2dc8447d87fc44"
+    - url: "POV_M.Fall.C.10m_reads.fa"
+      cksum: "sha256:2e86ef58a3db60ec030c7d7d1ab51dd48d919a9984ad608385cad5b7fece0f9b"
+    - url: "POV_M.Fall.I.10m_reads.fa"
+      cksum: "sha256:ac481a03a58e8f0dfde8360744a8d955b7530dc0cd8fb8bded27797eda5d87a8"
+    - url: "POV_M.Fall.I.42m_reads.fa"
+      cksum: "sha256:a7d5c693e40759ff0c407068129546290405b44f4b5204edde403b4be908803f"
+    - url: "POV_M.Fall.O.1000m_reads.fa"
+      cksum: "sha256:26c454b6fa156869da392b10e1b87fc9568f3ea3de16793b1087a18acde0a01b"
+    - url: "POV_M.Fall.O.105m_reads.fa"
+      cksum: "sha256:91373fa716c7661e00080f501e3c5f7472ad49512f999889f664be598cfadb52"
+    - url: "POV_M.Fall.O.10m_reads.fa"
+      cksum: "sha256:a413815e26cd88c08b58c179fe8b709ba47d2355a90ae9b17beacb7af0555c62"
+    - url: "POV_M.Fall.O.4300m_reads.fa"
+      cksum: "sha256:f1394e87dd1a0c0cd0aae0821d2e4615cb964a58f2402dd1207f0e3235e985f8"
+
+
+- name: Download libra app
+  get_url:
+    url: "{{ item.url }}"
+    checksum: "{{ item.cksum }}"
+    dest: "{{ dl_dir }}/{{ item.url | basename }}"
+  with_items:
+    - url: https://butler.opencloud.cs.arizona.edu/demo_apps/libra.tar.gz
+      cksum: "sha256:c41dd1808d74638616a27a09a0fd028805ca510bd95409d576477caf746f51b2"
+
+- name: Uncompress libra
+  unarchive:
+    src: "{{ dl_dir }}/libra.tar.gz"
+    dest: "{{ demoapps_dir }}/libra"
+    copy: no
+

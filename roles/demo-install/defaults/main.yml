@@ -1,0 +1,7 @@
+---
+# demo_install/defaults/main.yml
+
+dl_dir: /opt/downloads
+datasets_dir: /opt/datasets
+demoapps_dir: /opt/demoapps
+

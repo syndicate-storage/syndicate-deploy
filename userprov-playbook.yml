@@ -1,0 +1,15 @@
+---
+# create users on the system
+
+- name: load userlist
+  hosts: demo
+  become: yes
+  tasks:
+    - include_vars: vars/users.yml
+
+- name: provision users
+  hosts: demo
+  become: yes
+  roles:
+    - provision-users
+

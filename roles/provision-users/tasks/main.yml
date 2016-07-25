@@ -1,0 +1,18 @@
+---
+# provision-users/tasks/main
+
+- name: Create user accounts
+  user:
+    name: "{{ item.username }}"
+    comment: "{{ item.fullname | default(item.username) }}"
+    password: "{{ item.password }}"
+    groups:  "{{ item.groups | join(',') }}"
+  with_items: "{{ userlist }}"
+
+
+- name: Add ssh keys to user accounts
+  authorized_key:
+    user: "{{ item.username }}"
+    key: "{{ lookup('file', item.username ~ '.pubkey') }}"
+  with_items: "{{ userlist }}"
+

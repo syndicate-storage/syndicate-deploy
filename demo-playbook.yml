@@ -1,0 +1,34 @@
+---
+# Install demo systems
+
+- name: Prep systems
+  hosts: demo
+  become: yes
+  roles:
+    - common-prep
+    - ssh-lockdown
+    - ufw
+
+- name: Install Hadoop
+  hosts: hadoop
+  become: yes
+  roles:
+    - hadoop
+
+- name: Install Syndicate MS
+  hosts: syndicate-ms
+  become: yes
+  roles:
+    - syndicate-ms
+
+- name: Install Syndicate
+  hosts: demo
+  roles:
+    - syndicate
+
+- name: Install iRODS
+  hosts: irods
+  become: yes
+  roles:
+    - irods
+
