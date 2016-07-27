@@ -79,6 +79,12 @@
     - url: https://butler.opencloud.cs.arizona.edu/demo_apps/libra.tar.gz
       cksum: "sha256:c41dd1808d74638616a27a09a0fd028805ca510bd95409d576477caf746f51b2"
 
+- name: Create libra dir
+  file:
+    path: "{{ demoapps_dir }}/libra"
+    state: directory
+
+
 - name: Uncompress libra
   unarchive:
     src: "{{ dl_dir }}/libra.tar.gz"
