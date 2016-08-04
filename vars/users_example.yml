@@ -1,0 +1,15 @@
+---
+# users_example.yml
+
+userlist:
+  - username: exampleuser
+    fullname: "Example User"
+    password: "<hashed password, see http://docs.ansible.com/ansible/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module>"
+    groups:
+      - "sudo"
+  - username: exampletwo
+    fullname: "Example Two"
+    password: "<see above>"
+    groups:
+      - "sudo"
+
