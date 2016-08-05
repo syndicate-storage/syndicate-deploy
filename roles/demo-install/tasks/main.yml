@@ -68,6 +68,8 @@
       cksum: "sha256:a413815e26cd88c08b58c179fe8b709ba47d2355a90ae9b17beacb7af0555c62"
     - url: "POV_M.Fall.O.4300m_reads.fa"
       cksum: "sha256:f1394e87dd1a0c0cd0aae0821d2e4615cb964a58f2402dd1207f0e3235e985f8"
+    - url: "SHA256SUMS"
+      cksum: "sha256:b44b340b06172be9aabc845975ab03a84ae7be563b68a11ad2273ffad2e9a326"
 
 
 - name: Download libra app
@@ -77,7 +79,7 @@
     dest: "{{ dl_dir }}/{{ item.url | basename }}"
   with_items:
     - url: https://butler.opencloud.cs.arizona.edu/demo_apps/libra.tar.gz
-      cksum: "sha256:c41dd1808d74638616a27a09a0fd028805ca510bd95409d576477caf746f51b2"
+      cksum: "sha256:368a7d51137f4badea92f8995ddb8185b0b4258a27114459b27905369d8dd7c7"
 
 - name: Create libra dir
   file:
@@ -90,4 +92,3 @@
     src: "{{ dl_dir }}/libra.tar.gz"
     dest: "{{ demoapps_dir }}/libra"
     copy: no
-
