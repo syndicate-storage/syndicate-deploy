@@ -1,0 +1,10 @@
+---
+# Install development tools
+
+- name: Install Docker
+  become: yes
+  hosts: demo
+  roles:
+    - docker
+
+
