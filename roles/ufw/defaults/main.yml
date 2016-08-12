@@ -6,3 +6,5 @@ allowed_tcp_ports:
 allowed_udp_ports: {}
 
 allowed_local_tcp_ports: {}
+
+allowed_ip_ranges: {}

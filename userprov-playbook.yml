@@ -2,13 +2,13 @@
 # create users on the system
 
 - name: load userlist
-  hosts: demo
+  hosts: all
   become: yes
   tasks:
     - include_vars: vars/users.yml
 
 - name: provision users
-  hosts: demo
+  hosts: all
   become: yes
   roles:
     - provision-users

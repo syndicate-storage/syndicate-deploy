@@ -23,6 +23,15 @@
     - "{{ allowed_local_tcp_ports }}"
     - "{{ ansible_interfaces | map('replace','-','_') | list }}"
 
+- name: Allow other ranges access to TCP ports
+  when: "{{ allowed_ip_ranges | length > 0 }}"
+  ufw:
+    rule=allow port={{ item[0] }} proto=tcp
+    src="{{ item[1] }}"
+  with_nested:
+    - "{{ allowed_local_tcp_ports }}"
+    - "{{ allowed_ip_ranges }}"
+
 - name: Reject everything else
   ufw:
     state=enabled
