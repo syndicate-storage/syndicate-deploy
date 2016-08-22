@@ -71,6 +71,10 @@
     - url: "SHA256SUMS"
       cksum: "sha256:b44b340b06172be9aabc845975ab03a84ae7be563b68a11ad2273ffad2e9a326"
 
+- name: Make dl_dir
+  file:
+    path: "{{ dl_dir }}"
+    state: directory
 
 - name: Download libra app
   get_url:
