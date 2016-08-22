@@ -19,6 +19,19 @@
     - python-psycopg2
     - uuid-dev
 
+- name: Create iRODS users
+  user:
+    name: "{{ item.name }}"
+    password: "{{ item.password | password_hash('sha512') }}"
+  with_items:
+    - name: "{{ irods_admin_user }}"
+      password: "{{ irods_admin_password }}"
+    - name: "{{ irods_db_user }}"
+      password: "{{ irods_db_password }}"
+
+- name: Start postgresql
+  service: name=postgresql state=started
+    
 - name: Download iRODS packages
   get_url:
     url: "{{ item.url }}"
