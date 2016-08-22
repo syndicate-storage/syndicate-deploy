@@ -125,6 +125,9 @@
   register: irods_config
   ignore_errors: true
 
+  #For some reason, the db_password is always configured to "testpassword", so this task can manually fix it
+- name: Fix /etc/irods/database_config.json
+  replace: "dest=/etc/irods/database_config.json regexp='testpassword' replace='    \"db_password\": \"{{ irods_db_password }}\",' backup=yes"
 
 - name: Modify configuration file
   shell: "sed '1,2d' {{ dl_dir }}/setup_irods > {{ dl_dir }}/setup_irods_mod"
