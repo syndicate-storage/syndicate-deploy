@@ -1,6 +1,10 @@
 ---
 # irods/defaults/main.yml
 
+# iRODS Defaults
+
+
+# Download defaults
 dl_dir: /opt/downloads
 
 irods_packages:
@@ -9,19 +13,35 @@ irods_packages:
   - url: "ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu14/irods-database-plugin-postgres-1.8-ubuntu14-x86_64.deb"
     cksum: "sha256:70a00461dc77519ee1fb71d721e1798b19b21b7bfd1c2ce9d8aaada48bc56738"
 
-irods_port: 1247
 
-irods_zone: iplant
+# iRODS configuration defaults
 
 irods_admin_user: irods_admin
 irods_admin_password: phia*sooNgu9
 
+irods_port__main: 1247
+irods_port__control_plane: 1248
+
+irods_port__file_tx_range_begin: 20000
+irods_port__file_tx_range_end: 20199
+
+irods_server__zone: iplant
+irods_server__zone_key: TEMPORARY_zone_key
+irods_server__negotiation_key: TEMPORARY_32byte_negotiation_key
+irods_server__control_plane_key: TEMPORARY__32byte_ctrl_plane_key
+
 irods_vault_dir: "/var/lib/irods/iRODS/Vault"
 
-# postgres database settins
-irods_db_name: icat
+irods_validation_base_url: "off"
+
+# (Database specific)
 irods_db_user: irods_user
 irods_db_password: ievieicefue9o
+
+irods_db_name: icat
+irods_db_hostname: localhost
+irods_db_port: 5432
+
 
 # AMQP settings
 amqp_host: 'localhost'
