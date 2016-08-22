@@ -141,5 +141,6 @@
   when: irods_config.stdout.find("exactly") != -1
 
 - name: Configure iCommands for administration
-  when:
-  command: "iinit < {{ dl_dir }}/setup_irods"
+  become_user: "{{ irods_admin_user }}" 
+  shell: "iinit < {{ dl_dir }}/setup_icommands"
+  ignore_errors: true
