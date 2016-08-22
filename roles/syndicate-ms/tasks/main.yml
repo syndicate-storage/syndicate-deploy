@@ -1,0 +1,102 @@
+---
+# syndicate/tasks/main.yml
+# Installs syndicate packages
+
+- name: Prereqs and SSL support for apt for SSL
+  become: yes
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: installed
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - unzip
+    - make
+
+- name: Create syndicate user
+  user:
+    name: "{{ syndicate_user }}"
+    password: "{{ syndicate_password | password_hash('sha512') }}"
+
+- name: Make dl_dir
+  file:
+    path: "{{ dl_dir }}"
+    state: directory
+
+- name: Get the google app engine
+  get_url: 
+    url: "{{ GAE_SDK }}"
+    dest: "{{ dl_dir }}/{{ GAE_SDK | basename }}"
+
+- name: Install GAE
+  unarchive:
+    src: "{{ dl_dir }}/{{ GAE_SDK | basename }}"
+    dest: "/home/{{ syndicate_user }}"
+  ignore_errors: true
+  register: gae_install_status
+
+#check if unarchive failed (bug)
+- stat: 
+    path: "{{ gae_path }}"
+  register: gae_path_status
+- name: Install GAE, try again
+  shell: "cd /home/{{ syndicate_user }} && unzip {{ dl_dir }}/{{ GAE_SDK | basename }}"
+  when: gae_install_status.failed == true and ( gae_path_status.stat.isdir is not defined or gae_path_status.stat.isdir == false )
+
+- name: Trust butler opencloud apt repo
+  apt_key:
+    data: "{{ lookup('file', 'butler_opencloud_cs_arizona_edu_pub.gpg') }}"
+    state: present
+
+- name: Copy butler SSL key
+  copy:
+    src: butler.crt
+    dest: /usr/local/share/ca-certificates
+  register: ssl_key_added
+
+- name: Trust SSL key
+  when: ssl_key_added.changed
+  command: "update-ca-certificates"
+
+- name: Add apt repo for syndicate packages
+  apt_repository:
+    repo: "deb https://butler.opencloud.cs.arizona.edu/repos/release/syndicate syndicate main"
+    filename: "butler"
+    state: present
+
+- name: Install syndicate-ms packages
+  apt:
+    name: "{{ item }}" 
+    update_cache: yes
+    cache_valid_time: 3600
+    state: latest
+  with_items:
+    - syndicate-ms
+
+- name: Adjust syndicate directory ownerships
+  file:
+    path: "{{ item }}"
+    owner: "{{ syndicate_user }}"
+    recurse: yes
+    state: directory
+  with_items:
+    - "{{ datastore_path }}"
+    - "{{ ms_path }}"
+
+- name: Copy syndicate-ms files
+  copy:
+    src: "{{ item }}" 
+    dest: "{{ ms_path }}"
+    owner: "{{ syndicate_user }}"
+  with_items:
+    - configure_ms.mk
+    - app.yamlin
+    - Makefile
+
+- name: Configure syndicate-ms
+  shell: "cd {{ ms_path }} && make all"
+
+- name: Start syndicate-ms
+  shell: "daemon -- {{ gae_path }}/{{ gae_cmd }}"
