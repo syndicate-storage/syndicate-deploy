@@ -38,6 +38,21 @@
     checksum: "{{ item.cksum }}"
     dest: "{{ dl_dir }}/{{ item.url | basename }}"
   with_items: "{{ irods_packages }}"
+  ignore_errors: true
+  register: get_url_status
+
+- name: Install wget, if download failed
+  apt:
+     name="wget"
+     update_cache=yes
+     cache_valid_time=3600
+     state=installed
+  when: get_url_status.changed == false
+
+- name: wget iRODS package, if download failed
+  command: wget -N {{ item.url }} -P {{ dl_dir }} 
+  with_items: "{{ irods_packages }}"
+  when: get_url_status.changed == false
 
 - name: Install iRODS packages
   apt:
