@@ -121,12 +121,22 @@
     - setup_irods
 
 - name: Configure iRODS service
-  when:
-  command: "/var/lib/irods/packaging/setup_irods.sh < {{ dl_dir }}/setup_irods"
+  shell: "/var/lib/irods/packaging/setup_irods.sh < {{ dl_dir }}/setup_irods"
+  register: irods_config
+  ignore_errors: true
+
+
+- name: Modify configuration file
+  shell: "sed '1,2d' {{ dl_dir }}/setup_irods > {{ dl_dir }}/setup_irods_mod"
+  #if irods_config fails, a comment saying "must be exactly 32 bytes" is printed, so key off of the word "exactly"
+  when: irods_config.stdout.find("exactly") != -1
+
+- name: Re-configure iRODS service
+  shell: "/var/lib/irods/packaging/setup_irods.sh < {{ dl_dir }}/setup_irods_mod"
+  register: irods_reconfig
+  ignore_errors: true
+  when: irods_config.stdout.find("exactly") != -1
 
 - name: Configure iCommands for administration
   when:
   command: "iinit < {{ dl_dir }}/setup_irods"
-
-
-
