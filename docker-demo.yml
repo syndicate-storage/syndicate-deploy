@@ -1,0 +1,42 @@
+---
+# Create and install docker demo systems
+
+- name: Build docker containers
+  hosts: all
+  connection: local
+  roles:
+    - docker-demo
+
+- name: Install Syndicate MS
+  hosts: syndicate-ms
+  connection: docker
+  become: yes
+  roles:
+    - syndicate-ms
+
+- name: Prep systems
+  hosts: demo
+  connection: docker
+  become: yes
+  roles:
+    - common-prep
+
+- name: Install Hadoop
+  hosts: hadoop
+  connection: docker
+  become: yes
+  roles:
+    - hadoop
+
+- name: Install iRODS
+  hosts: irods
+  connection: docker
+  become: yes
+  roles:
+    - irods
+
+- name: Install Syndicate
+  hosts: docker-synclient1
+  connection: docker
+  roles:
+    - syndicate
