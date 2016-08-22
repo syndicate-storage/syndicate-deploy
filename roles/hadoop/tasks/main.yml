@@ -139,7 +139,7 @@
 
 - name: Format HDFS on namenode
   when: "inventory_hostname == groups['namenode'][0] and not hdfs_dn.stat.exists"
-  command: "{{ hadoop_home }}/bin/hadoop namenode -format"
+  shell: ". /etc/profile.d/java.sh && {{ hadoop_home }}/bin/hadoop namenode -format"
 
 - name: Start hadoop processes on namenode
   when: "inventory_hostname == groups['namenode'][0]"
