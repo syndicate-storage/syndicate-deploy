@@ -1,0 +1,130 @@
+---
+# irods/defaults/main.yml
+
+
+# iRODS configuration defaults
+
+irods_path: "/home/syndicate/irods"
+
+irods:
+  users:
+    primary:
+      username: syndicate
+      password: syndicate
+    admin:
+      username: rods
+      password: rods
+  path: "{{ irods_path }}"
+  port:
+    main: 1247
+    control_plane: 1248
+    file_tx_range_begin: 20000
+    file_tx_range_end: 20199
+  server:
+    zone: iplant
+    keys:
+      zone: TEMPORARY_zone_key
+      negotiation: TEMPORARY_32byte_negotiation_key
+      control_plane: TEMPORARY__32byte_ctrl_plane_key
+    resource_name: demoResc
+    vault_dir: "{{ irods_path }}/iRODS/Vault"
+    validation_base_url: "off"
+  database:
+    name: iCAT
+    hostname: localhost
+    port: 5432
+
+amqp:
+  host: 'localhost'
+  port: 5672
+  user: 'irods_ampq_user'
+  password: 'irods_ampq_pass'
+
+
+# Download defaults
+dl_dir: /opt/downloads
+    
+irods_prereq_packages:
+  - ant
+  - build-essential
+  - git
+  - odbc-postgresql
+  - openjdk-7-jdk
+  - postgresql-9.3
+  - python-pika
+  - python-psycopg2
+  - rabbitmq-server
+  - unixodbc-dev
+  - unzip
+  - uuid-dev
+  - uuid-runtime
+
+prereq_enable_services:
+  - postgresql
+  - rabbitmq-server
+
+#downloads information
+downloads:
+  irods:  #irods
+    src: 'https://github.com/irods/irods-legacy/archive/3.3.1.zip'  #<download from location/website>
+    creates: 'irods-legacy-3.3.1'                                   #<directory created after being uncompressed
+    dest: '{{ irods.path }}'                                        #<destination directory
+  setavu: #setavu
+    src: 'https://github.com/cyverse/irods-setavu-mod/archive/master.zip'
+    creates: 'irods-setavu-mod-master'
+    dest: '{{ irods.path }}/iRODS/modules/setavu'
+  bms:    #bms
+    src: 'https://github.com/iychoi/iPlantBorderMessageServer/archive/master.zip'
+    creates: 'iPlantBorderMessageServer-master'
+    dest: '{{ irods.path }}/bms'
+
+# template information
+templates:
+  - src: reConfigs/ipc-amqp.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-amqp.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/ipc-custom.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-custom.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/ipc-env.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-env.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/ipc-json.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-json.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/ipc-logic.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-logic.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/ipc-uuid.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-uuid.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/server.config.in.j2
+    dest: "{{ irods_path }}/iRODS/server/config/server.config.in"
+    mode: "u=rw,g=r,o=r"
+  - src: commands/amqptopicsend.py.j2
+    dest: "{{ irods_path }}/iRODS/server/bin/cmd/amqptopicsend.py"
+    mode: "u=rwx,g=rw,o=rw"
+  - src: commands/generateuuid.sh.j2
+    dest: "{{ irods_path }}/iRODS/server/bin/cmd/generateuuid.sh"
+    mode: "u=rwx,g=rw,o=rw"
+  - src: setup.sql.j2
+    dest: "{{ irods_path }}/setup.sql"
+    mode: "u=rwx,g=rwx,o=rx"
+  - src: setup_postgres.sh.j2
+    dest: "{{ irods_path }}/setup_postgres.sh"
+    mode: "u=rwx,g=rwx,o=rx"
+  - src: setup_rabbitMQ.sh.j2
+    dest: "{{ irods_path }}/setup_rabbitMQ.sh"
+    mode: "u=rwx,g=rwx,o=rx"
+  - src: irods.config.j2
+    dest: "{{ irods_path }}/iRODS/config/irods.config"
+    mode: "u=rw,g=r,o=r"
+  - src: odbc.ini.j2
+    dest: "{{ irods_path }}/.odbc.ini"
+    mode: "u=rw,g=r,o=r"
+  - src: bms.config.j2
+    dest: "{{ irods_path }}/bms/bms.config"
+    mode: "u=rwx,g=rwx,o=rx"
+  - src: collection.c.j2
+    dest: "{{ irods_path }}/iRODS/server/core/src/"
+    mode: "u=rw,g=r,o=r"

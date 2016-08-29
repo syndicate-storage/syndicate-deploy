@@ -1,0 +1,116 @@
+---
+# irods/tasks/main.yml
+
+- name: Make downloads directory
+  file:
+    path: "{{ dl_dir }}"
+    state: directory
+
+- name: Install iRODS prerequisites
+  apt:
+    name={{ item }}
+    update_cache=yes
+    cache_valid_time=3600
+    state=installed
+  with_items: "{{ irods_prereq_packages }}"
+
+- name: Enable RabbitMQ Management Plugin
+  command: rabbitmq-plugins enable rabbitmq_management
+
+- name: Link psqlodbca.so
+  file:
+    src: /usr/lib/x86_64-linux-gnu/odbc/psqlodbca.so
+    dest: /usr/lib/postgresql/9.3/lib/libodbcpsql.so
+    state: link
+
+- name: Enable and start prerequisite services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items: "{{ prereq_enable_services }}" 
+
+- name: Create iRODS users
+  user:
+    name: "{{ item.value.username }}"
+    password: "{{ item.value.password | password_hash('sha512') }}"
+  with_dict: "{{ irods.users }}"
+
+- name: Download and uncompress iRODS files
+  unarchive:
+    src: "{{ item.value.src }}"
+    dest: "{{ dl_dir }}"
+    copy: no   #the "copy" option will be depricated but this doesn't work with it's replacement ("remote_src"), so this will fail in the future
+  with_dict: "{{ downloads }}"
+
+- stat: 
+    path: "{{ irods.path }}"
+  register: irodspath_stat
+
+- name: Install iRODS
+  command: "cp -r {{ dl_dir }}/{{ downloads.irods.creates }} {{ irods.path }}"
+  when: irodspath_stat.stat.exists == False
+
+- name: Create required directories
+  file:
+    path: "{{ item.value.dest|dirname }}"
+    state: directory
+  with_dict: "{{ downloads }}"
+
+- stat: 
+    path: "{{ downloads.setavu.dest }}"
+  register: setavupath_stat
+
+- name: Install Cyverse setAVU module
+  command: "cp -r {{ dl_dir }}/{{ downloads.setavu.creates }} {{ downloads.setavu.dest }}"
+  when: setavupath_stat.stat.exists == False
+
+- stat: 
+    path: "{{ downloads.bms.dest }}"
+  register: bmspath_stat
+
+- name: Install bms
+  command: "cp -r {{ dl_dir }}/{{ downloads.bms.creates }} {{ downloads.bms.dest }}"
+  when: bmspath_stat.stat.exists == False
+
+- name: Copy iRODS rules and command scripts
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items: "{{ templates }}"
+
+- name: Change iRODS path ownership
+  command: "chown -R {{ irods.users.primary.username }}:{{ irods.users.primary.username }} {{ irods.path }}"
+
+- name: Configure Postgres DB for iRODS
+  command: "{{ irods.path }}/setup_postgres.sh"
+
+- name: Configure RabbitMQ for iRODS
+  command: "{{ irods.path }}/setup_rabbitMQ.sh"
+    
+- name: Compile, setup and start iRODS service
+  shell: "yes | ./irodssetup"
+  become_user: "{{ irods.users.primary.username }}"
+  args:
+    chdir: "{{ irods.path }}/iRODS"
+  ignore_errors: true
+  register: irods_stat
+
+# The first attempt does not connect to the database...
+# try again, it should work this time
+- name: Retry start iRODS service
+  shell: "yes | ./irodssetup"
+  become_user: "{{ irods.users.primary.username }}"
+  args:
+    chdir: "{{ irods.path }}/iRODS"
+  when: irods_stat.failed == true
+
+- name: Set PATH for server commands
+  lineinfile: dest="/home/{{ irods.users.primary.username }}/.bashrc" line='export PATH=$PATH:{{ irods.path }}/iRODS/server/bin/cmd' insertafter='EOF' regexp='export PATH=$PATH:{{ irods.path }}/iRODS/server/bin/cmd' state=present
+
+- name: Set PATH for icommands
+  lineinfile: dest="/home/{{ irods.users.primary.username }}/.bashrc" line='export PATH=$PATH:{{ irods.path }}/iRODS/clients/icommands/bin' insertafter='EOF' regexp='export PATH=$PATH:{{ irods.path }}/iRODS/clients/icommands/bin' state=present
+
+- name: Start BMS
+  shell: "nohup {{ irods.path }}/bms/start.sh {{ irods.path }}/bms/bms.config &"

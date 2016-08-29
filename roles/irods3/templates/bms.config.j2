@@ -1,0 +1,18 @@
+{
+    "message_server_conf":{
+        "hostname":"{{ amqp.host }}",
+        "port":{{ amqp.port }},
+        "user_id":"{{ amqp.user }}",
+        "user_pwd":"{{ amqp.password }}",
+        "vhost_subscribe":"/",
+        "vhost_publish":"/irods/useraccess"
+    },
+    "datastore_conf":{
+        "hostname":"localhost",
+        "port":{{ irods.port.main }},
+        "user_id":"{{ amqp.user }}",
+        "user_pwd":"{{ amqp.password }}",
+        "zone":"{{ irods.server.zone }}"
+    }
+}
+
