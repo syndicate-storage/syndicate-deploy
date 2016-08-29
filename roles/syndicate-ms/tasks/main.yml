@@ -10,10 +10,7 @@
     cache_valid_time: 3600
     state: installed
   with_items:
-    - apt-transport-https
-    - ca-certificates
-    - unzip
-    - make
+    - "{{ syndicatems_prereq_packages }}"
 
 - name: Create syndicate user
   user:
