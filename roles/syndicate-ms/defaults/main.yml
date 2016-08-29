@@ -3,6 +3,13 @@
 
 # Syndicate-ms Defaults
 
+syndicatems_prereq_packages:
+  - apt-transport-https
+  - ca-certificates
+  - unzip
+  - make
+  - daemon
+
 syndicate_user: syndicate
 syndicate_password: syndicate
 
