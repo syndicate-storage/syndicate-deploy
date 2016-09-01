@@ -1,0 +1,8 @@
+---
+# Set whether to "pre-load" or install the defined packages in the docker image prior to having ansible install packages in the docker running container.
+# Setting to "true" allows the docker image to be reused with the installed packages, thus saving time for each subsequent install.
+
+docker_preload_packages: false
+
+irods3_packages: "'ant build-essential git odbc-postgresql openjdk-7-jdk postgresql-9.3 python-pika python-psycopg2 rabbitmq-server unixodbc-dev unzip uuid-dev uuid-runtime'"
+irods4_packages: "'git postgresql-9.3 python-pika python-psycopg2 uuid-dev'"
