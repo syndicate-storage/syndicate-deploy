@@ -1,52 +1,103 @@
 ---
 # irods/defaults/main.yml
 
-# iRODS Defaults
+
+# iRODS configuration defaults
+
+irods_path: "/var/lib/irods"
+
+config:
+  amqp:
+    host: 'localhost'
+    port: 5672
+    user: 'irods_ampq_user'
+    password: 'irods_ampq_pass'
+  database:
+    name: iCAT
+    hostname: localhost
+    port: 5432
+  irods:
+    key:
+      zone: TEMPORARY_zone_key
+      negotiation: TEMPORARY_32byte_negotiation_key
+      control_plane: TEMPORARY__32byte_ctrl_plane_key
+    path: "{{ irods_path }}"
+    port:
+      main: 1247
+      control_plane: 1248
+      file_tx_range_begin: 20000
+      file_tx_range_end: 20199
+    resource_name: demoResc
+    vault_dir: "{{ irods_path }}/iRODS/Vault"
+    validation_base_url: "off"
+    zone: iplant
+    users:
+      primary:
+        username: irods_user
+        password: ievieicefue9o
+      admin:
+        username: irods_admin
+        password: phia*sooNgu9
 
 
 # Download defaults
 dl_dir: /opt/downloads
+    
+# Prerequisite packages
+prereq_packages:
+  - git
+  - postgresql-9.3
+  - python-pika
+  - python-psycopg2
+  - uuid-dev
 
-irods_packages:
-  - url: "ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu14/irods-icat-4.1.8-ubuntu14-x86_64.deb"
-    cksum: "sha256:a33567e6563f7f9e024a38a43d7d208da5e053df10dc91eee310d4e057259ac6"
-  - url: "ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu14/irods-database-plugin-postgres-1.8-ubuntu14-x86_64.deb"
-    cksum: "sha256:70a00461dc77519ee1fb71d721e1798b19b21b7bfd1c2ce9d8aaada48bc56738"
+# Enable/start the following services
+prereq_enable_services:
+  - postgresql
 
+# installation downloads
+downloads:
+  irods: #software
+    - src: "ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu14/irods-icat-4.1.8-ubuntu14-x86_64.deb"   #src
+      cksum: "sha256:a33567e6563f7f9e024a38a43d7d208da5e053df10dc91eee310d4e057259ac6"                    #checksum
+      dest: "{{ dl_dir }}"                                                                                #path to download to
+      creates: "irods-icat-4.1.8-ubuntu14-x86_64.deb"                                                     #file or directory created
+    - src: "ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu14/irods-database-plugin-postgres-1.8-ubuntu14-x86_64.deb"
+      cksum: "sha256:70a00461dc77519ee1fb71d721e1798b19b21b7bfd1c2ce9d8aaada48bc56738"
+      dest: "{{ dl_dir }}"
+      creates: "irods-database-plugin-postgres-1.8-ubuntu14-x86_64.deb"
 
-# iRODS configuration defaults
+repos:
+  setavu:
+    src: "https://github.com/cyverse/irods-setavu-mod"
+    dest: "{{ irods_path }}/iRODS/modules/setavu"
+  cmd_scripts:
+    src: "https://github.com/cyverse/irods-cmd-scripts"
+    dest: ""
 
-irods_admin_user: irods_admin
-irods_admin_password: phia*sooNgu9
-
-irods_port__main: 1247
-irods_port__control_plane: 1248
-
-irods_port__file_tx_range_begin: 20000
-irods_port__file_tx_range_end: 20199
-
-irods_server__zone: iplant
-irods_server__zone_key: TEMPORARY_zone_key
-irods_server__negotiation_key: TEMPORARY_32byte_negotiation_key
-irods_server__control_plane_key: TEMPORARY__32byte_ctrl_plane_key
-
-irods_vault_dir: "/var/lib/irods/iRODS/Vault"
-
-irods_validation_base_url: "off"
-
-# (Database specific)
-irods_db_user: irods_user
-irods_db_password: ievieicefue9o
-
-irods_db_name: icat
-irods_db_hostname: localhost
-irods_db_port: 5432
-
-
-# AMQP settings
-amqp_host: 'localhost'
-amqp_port: 5672
-amqp_user: 'irods_ampq_user'
-amqp_password: 'irods_ampq_pass'
-
-
+# template information
+templates:
+  - src: reConfigs/ipc-amqp.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-amqp.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/ipc-custom.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-custom.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/ipc-env.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-env.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/ipc-json.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-json.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/ipc-logic.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-logic.re"
+    mode: "u=rw,g=r,o=r"
+  - src: reConfigs/ipc-uuid.re.j2
+    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-uuid.re"
+    mode: "u=rw,g=r,o=r"
+  - src: setup_icommands.j2
+    dest: "{{ dl_dir }}/setup_icommands"
+    mode: "u=rw,g=r,o=r"
+  - src: setup_irods.j2
+    dest: "{{ dl_dir }}/setup_irods"
+    mode: "u=rw,g=r,o=r"

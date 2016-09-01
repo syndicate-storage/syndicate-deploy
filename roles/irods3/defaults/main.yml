@@ -6,45 +6,43 @@
 
 irods_path: "/home/syndicate/irods"
 
-irods:
-  users:
-    primary:
-      username: syndicate
-      password: syndicate
-    admin:
-      username: rods
-      password: rods
-  path: "{{ irods_path }}"
-  port:
-    main: 1247
-    control_plane: 1248
-    file_tx_range_begin: 20000
-    file_tx_range_end: 20199
-  server:
-    zone: iplant
-    keys:
-      zone: TEMPORARY_zone_key
-      negotiation: TEMPORARY_32byte_negotiation_key
-      control_plane: TEMPORARY__32byte_ctrl_plane_key
-    resource_name: demoResc
-    vault_dir: "{{ irods_path }}/iRODS/Vault"
-    validation_base_url: "off"
+config:
+  amqp:
+    host: 'localhost'
+    port: 5672
+    user: 'irods_ampq_user'
+    password: 'irods_ampq_pass'
   database:
     name: iCAT
     hostname: localhost
     port: 5432
-
-amqp:
-  host: 'localhost'
-  port: 5672
-  user: 'irods_ampq_user'
-  password: 'irods_ampq_pass'
-
+  irods:
+    key:
+      zone: TEMPORARY_zone_key
+      negotiation: TEMPORARY_32byte_negotiation_key
+      control_plane: TEMPORARY__32byte_ctrl_plane_key
+    path: "{{ irods_path }}"
+    port:
+      main: 1247
+      control_plane: 1248
+      file_tx_range_begin: 20000
+      file_tx_range_end: 20199
+    resource_name: demoResc
+    vault_dir: "{{ irods_path }}/iRODS/Vault"
+    validation_base_url: "off"
+    zone: iplant
+    users:
+      primary:
+        username: syndicate
+        password: syndicate
+      admin:
+        username: rods
+        password: rods
 
 # Download defaults
 dl_dir: /opt/downloads
     
-irods_prereq_packages:
+prereq_packages:
   - ant
   - build-essential
   - git
@@ -59,24 +57,25 @@ irods_prereq_packages:
   - uuid-dev
   - uuid-runtime
 
+# Enable/start the following services
 prereq_enable_services:
   - postgresql
   - rabbitmq-server
 
-#downloads information
+# installation downloads
 downloads:
   irods:  #irods
     src: 'https://github.com/irods/irods-legacy/archive/3.3.1.zip'  #<download from location/website>
     creates: 'irods-legacy-3.3.1'                                   #<directory created after being uncompressed
-    dest: '{{ irods.path }}'                                        #<destination directory
+    dest: '{{ irods_path }}'                                        #<destination directory
   setavu: #setavu
     src: 'https://github.com/cyverse/irods-setavu-mod/archive/master.zip'
     creates: 'irods-setavu-mod-master'
-    dest: '{{ irods.path }}/iRODS/modules/setavu'
+    dest: '{{ irods_path }}/iRODS/modules/setavu'
   bms:    #bms
     src: 'https://github.com/iychoi/iPlantBorderMessageServer/archive/master.zip'
     creates: 'iPlantBorderMessageServer-master'
-    dest: '{{ irods.path }}/bms'
+    dest: '{{ irods_path }}/bms'
 
 # template information
 templates:

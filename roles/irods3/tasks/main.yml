@@ -6,13 +6,19 @@
     path: "{{ dl_dir }}"
     state: directory
 
-- name: Install iRODS prerequisites
+- name: Install prerequisites
   apt:
     name={{ item }}
     update_cache=yes
     cache_valid_time=3600
     state=installed
-  with_items: "{{ irods_prereq_packages }}"
+  with_items: "{{ prereq_packages }}"
+
+- name: Create iRODS users
+  user:
+    name: "{{ item.value.username }}"
+    password: "{{ item.value.password | password_hash('sha512') }}"
+  with_dict: "{{ config.irods.users }}"
 
 - name: Enable RabbitMQ Management Plugin
   command: rabbitmq-plugins enable rabbitmq_management
@@ -30,13 +36,7 @@
     enabled: yes
   with_items: "{{ prereq_enable_services }}" 
 
-- name: Create iRODS users
-  user:
-    name: "{{ item.value.username }}"
-    password: "{{ item.value.password | password_hash('sha512') }}"
-  with_dict: "{{ irods.users }}"
-
-- name: Download and uncompress iRODS files
+- name: Download and uncompress install zip files
   unarchive:
     src: "{{ item.value.src }}"
     dest: "{{ dl_dir }}"
@@ -44,11 +44,11 @@
   with_dict: "{{ downloads }}"
 
 - stat: 
-    path: "{{ irods.path }}"
+    path: "{{ config.irods.path }}"
   register: irodspath_stat
 
 - name: Install iRODS
-  command: "cp -r {{ dl_dir }}/{{ downloads.irods.creates }} {{ irods.path }}"
+  command: "cp -r {{ dl_dir }}/{{ downloads.irods.creates }} {{ config.irods.path }}"
   when: irodspath_stat.stat.exists == False
 
 - name: Create required directories
@@ -81,19 +81,19 @@
   with_items: "{{ templates }}"
 
 - name: Change iRODS path ownership
-  command: "chown -R {{ irods.users.primary.username }}:{{ irods.users.primary.username }} {{ irods.path }}"
+  command: "chown -R {{ config.irods.users.primary.username }}:{{ config.irods.users.primary.username }} {{ config.irods.path }}"
 
 - name: Configure Postgres DB for iRODS
-  command: "{{ irods.path }}/setup_postgres.sh"
+  command: "{{ config.irods.path }}/setup_postgres.sh"
 
 - name: Configure RabbitMQ for iRODS
-  command: "{{ irods.path }}/setup_rabbitMQ.sh"
+  command: "{{ config.irods.path }}/setup_rabbitMQ.sh"
     
 - name: Compile, setup and start iRODS service
   shell: "yes | ./irodssetup"
-  become_user: "{{ irods.users.primary.username }}"
+  become_user: "{{ config.irods.users.primary.username }}"
   args:
-    chdir: "{{ irods.path }}/iRODS"
+    chdir: "{{ config.irods.path }}/iRODS"
   ignore_errors: true
   register: irods_stat
 
@@ -101,16 +101,16 @@
 # try again, it should work this time
 - name: Retry start iRODS service
   shell: "yes | ./irodssetup"
-  become_user: "{{ irods.users.primary.username }}"
+  become_user: "{{ config.irods.users.primary.username }}"
   args:
-    chdir: "{{ irods.path }}/iRODS"
+    chdir: "{{ config.irods.path }}/iRODS"
   when: irods_stat.failed == true
 
 - name: Set PATH for server commands
-  lineinfile: dest="/home/{{ irods.users.primary.username }}/.bashrc" line='export PATH=$PATH:{{ irods.path }}/iRODS/server/bin/cmd' insertafter='EOF' regexp='export PATH=$PATH:{{ irods.path }}/iRODS/server/bin/cmd' state=present
+  lineinfile: dest="/home/{{ config.irods.users.primary.username }}/.bashrc" line='export PATH=$PATH:{{ config.irods.path }}/iRODS/server/bin/cmd' insertafter='EOF' regexp='export PATH=$PATH:{{ config.irods.path }}/iRODS/server/bin/cmd' state=present
 
 - name: Set PATH for icommands
-  lineinfile: dest="/home/{{ irods.users.primary.username }}/.bashrc" line='export PATH=$PATH:{{ irods.path }}/iRODS/clients/icommands/bin' insertafter='EOF' regexp='export PATH=$PATH:{{ irods.path }}/iRODS/clients/icommands/bin' state=present
+  lineinfile: dest="/home/{{ config.irods.users.primary.username }}/.bashrc" line='export PATH=$PATH:{{ config.irods.path }}/iRODS/clients/icommands/bin' insertafter='EOF' regexp='export PATH=$PATH:{{ config.irods.path }}/iRODS/clients/icommands/bin' state=present
 
 - name: Start BMS
-  shell: "nohup {{ irods.path }}/bms/start.sh {{ irods.path }}/bms/bms.config &"
+  shell: "nohup {{ config.irods.path }}/bms/start.sh {{ config.irods.path }}/bms/bms.config &"

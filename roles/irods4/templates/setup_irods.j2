@@ -1,22 +1,22 @@
-{{ irods_db_user }}
-{{ irods_db_password }}
-{{ irods_server__zone }}
-{{ irods_port__main }}
-{{ irods_port__file_tx_range_begin }}
-{{ irods_port__file_tx_range_end }}
-{{ irods_vault_dir }}
-{{ irods_server__zone_key }}
-{{ irods_server__negotiation_key }}
-{{ irods_port__control_plane }}
-{{ irods_server__control_plane_key }}
-{{ irods_validation_base_url }}
-{{ irods_admin_user }}
-{{ irods_admin_password }}
+{{ config.irods.users.primary.username }}
+{{ config.irods.users.primary.password }}
+{{ config.irods.zone }}
+{{ config.irods.port.main }}
+{{ config.irods.port.file_tx_range_begin }}
+{{ config.irods.port.file_tx_range_end }}
+{{ config.irods.vault_dir }}
+{{ config.irods.key.zone }}
+{{ config.irods.key.negotiation }}
+{{ config.irods.port.control_plane }}
+{{ config.irods.key.control_plane }}
+{{ config.irods.validation_base_url }}
+{{ config.irods.users.admin.username }}
+{{ config.irods.users.admin.password }}
 yes
-{{ irods_db_hostname }}
-{{ irods_db_port }}
-{{ irods_db_name }}
-{{ irods_db_user }}
-{{ irods_db_password }}
+{{ config.database.hostname }}
+{{ config.database.port }}
+{{ config.database.name }}
+{{ config.irods.users.primary.username }}
+{{ config.irods.users.primary.password }}
 yes
 

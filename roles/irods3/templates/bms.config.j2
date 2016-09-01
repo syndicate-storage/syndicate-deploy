@@ -1,18 +1,18 @@
 {
     "message_server_conf":{
-        "hostname":"{{ amqp.host }}",
-        "port":{{ amqp.port }},
-        "user_id":"{{ amqp.user }}",
-        "user_pwd":"{{ amqp.password }}",
+        "hostname":"{{ config.amqp.host }}",
+        "port":{{ config.amqp.port }},
+        "user_id":"{{ config.amqp.user }}",
+        "user_pwd":"{{ config.amqp.password }}",
         "vhost_subscribe":"/",
         "vhost_publish":"/irods/useraccess"
     },
     "datastore_conf":{
-        "hostname":"localhost",
-        "port":{{ irods.port.main }},
-        "user_id":"{{ amqp.user }}",
-        "user_pwd":"{{ amqp.password }}",
-        "zone":"{{ irods.server.zone }}"
+        "hostname":"{{ config.database.hostname }}",
+        "port":{{ config.irods.port.main }},
+        "user_id":"{{ config.amqp.user }}",
+        "user_pwd":"{{ config.amqp.password }}",
+        "zone":"{{ config.irods.zone }}"
     }
 }
 

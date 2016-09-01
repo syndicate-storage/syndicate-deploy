@@ -1,43 +1,38 @@
 ---
 # irods/tasks/main.yml
 
-- name: Make dl_dir
+- name: Make downloads directory
   file:
     path: "{{ dl_dir }}"
     state: directory
 
-- name: Install iRODS role prereqs
+- name: Install prerequisites
   apt:
     name={{ item }}
     update_cache=yes
     cache_valid_time=3600
     state=installed
-  with_items:
-    - git
-    - postgresql-9.3
-    - python-pika
-    - python-psycopg2
-    - uuid-dev
+  with_items: "{{ prereq_packages }}"
 
 - name: Create iRODS users
   user:
-    name: "{{ item.name }}"
-    password: "{{ item.password | password_hash('sha512') }}"
-  with_items:
-    - name: "{{ irods_admin_user }}"
-      password: "{{ irods_admin_password }}"
-    - name: "{{ irods_db_user }}"
-      password: "{{ irods_db_password }}"
+    name: "{{ item.value.username }}"
+    password: "{{ item.value.password | password_hash('sha512') }}"
+  with_dict: "{{ config.irods.users }}"
 
-- name: Start postgresql
-  service: name=postgresql state=started
-    
-- name: Download iRODS packages
+- name: Enable and start prerequisite services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items: "{{ prereq_enable_services }}" 
+
+- name: Download install packages
   get_url:
-    url: "{{ item.url }}"
+    src: "{{ item.src }}"
     checksum: "{{ item.cksum }}"
-    dest: "{{ dl_dir }}/{{ item.url | basename }}"
-  with_items: "{{ irods_packages }}"
+    dest: "{{ item.dest }}/{{ item.creates }}"
+  with_items: "{{ downloads.irods }}"
   ignore_errors: true
   register: get_url_status
 
@@ -50,84 +45,73 @@
   when: get_url_status.changed == false
 
 - name: wget iRODS package, if download failed
-  command: wget -N {{ item.url }} -P {{ dl_dir }} 
-  with_items: "{{ irods_packages }}"
+  command: wget -N {{ item.src }} -P {{ item.dest }} 
+  with_items: "{{ downloads.irods }}"
   when: get_url_status.changed == false
 
-- name: Install iRODS packages
+- name: Install iRODS
   apt:
-    deb: "{{ dl_dir }}/{{ item.url | basename  }}"
+    deb: "{{ item.dest }}/{{ item.creates }}"
     state: installed
-  with_items: "{{ irods_packages }}"
+  with_items: "{{ downloads.irods }}"
 
-- name: add iRODS database
-  become_user: postgres
-  postgresql_db:
-    name: "{{ irods_db_name }}"
-
-- name: add iRODS admin user to postgres
-  become_user: postgres
-  postgresql_user:
-    db: "{{ irods_db_name }}"
-    priv: ALL
-    name: "{{ irods_db_user }}"
-    password: "{{ irods_db_password }}"
-
-- name: copy over reConfile rule files
-  template:
-    src: "reConfigs/{{ item }}.j2"
-    dest: "/var/lib/irods/iRODS/server/config/reConfigs/{{ item }}"
-  with_items:
-    - ipc-amqp.re
-    - ipc-custom.re
-    - ipc-env.re
-    - ipc-json.re
-    - ipc-logic.re
-    - ipc-uuid.re
-
-- name: clone Cyverse iRODS repos
+- name: Clone Cyverse iRODS repos
   git:
-    repo: "{{ item }}"
-    dest: "{{ dl_dir }}/{{ item | basename }}"
+    repo: "{{ item.value.src }}"
+    dest: "{{ dl_dir }}/{{ item.value.src | basename }}"
     version: master
-  with_items:
-    - "https://github.com/cyverse/irods-setavu-mod"
-    - "https://github.com/cyverse/irods-cmd-scripts"
+  with_dict: "{{ repos }}"
 
-- name: Make iRODS modules directory
+- name: Create required directories
   file:
-    path: "/var/lib/irods/iRODS/modules/"
+    path: "{{ item.value.dest|dirname }}"
     state: directory
+  when: item.value.dest != "" 
+  with_dict: "{{ repos }}"
 
-- name: install Cyverse setAVU module
-  command: "cp -r {{ dl_dir }}/irods-setavu-mod /var/lib/irods/iRODS/modules/setavu"
+- name: Install Cyverse setAVU module
+  command: "cp -r {{ dl_dir }}/{{ item.value.src | basename }} {{ item.value.dest }}"
+  when: item.value.dest != "" 
   args:
-    creates: "/var/lib/irods/iRODS/modules/setavu"
+    creates: "{{ item.value.dest }}"
+  with_dict: "{{ repos }}"
 
-- name: install Cyverse command scripts
-  command: "cp -r {{ dl_dir }}/irods-cmd-scripts/{{ item }} /var/lib/irods/iRODS/server/bin/cmd/{{ item }}"
+- name: Install Cyverse command scripts
+  command: "cp -r {{ dl_dir }}/irods-cmd-scripts/{{ item }} {{ config.irods.path }}/iRODS/server/bin/cmd/{{ item }}"
   args:
-    creates: "/var/lib/irods/iRODS/server/bin/cmd/{{ item }}"
+    creates: "{{ config.irods.path }}/iRODS/server/bin/cmd/{{ item }}"
   with_items:
     - "amqptopicsend.py"
     - "generateuuid.sh"
 
-- name: Create iRODS configuration files
+- name: Add iRODS database
+  become_user: postgres
+  postgresql_db:
+    name: "{{ config.database.name }}"
+
+- name: Add iRODS primary user to postgres
+  become_user: postgres
+  postgresql_user:
+    db: "{{ config.database.name }}"
+    priv: ALL
+    name: "{{ config.irods.users.primary.username }}"
+    password: "{{ config.irods.users.primary.password }}"
+
+- name: Copy iRODS rules
   template:
-    src: "{{ item }}.j2"
-    dest: "{{ dl_dir }}/{{ item }}"
-  with_items:
-    - setup_icommands
-    - setup_irods
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items: "{{ templates }}"
 
 - name: Configure iRODS service
-  shell: "/var/lib/irods/packaging/setup_irods.sh < {{ dl_dir }}/setup_irods"
+  shell: "{{ config.irods.path }}/packaging/setup_irods.sh < {{ dl_dir }}/setup_irods"
   register: irods_config
   ignore_errors: true
 
   #For some reason, the db_password is always configured to "testpassword", so this task can manually fix it
 - name: Fix /etc/irods/database_config.json
-  replace: "dest=/etc/irods/database_config.json regexp='testpassword' replace='    \"db_password\": \"{{ irods_db_password }}\",' backup=yes"
+  replace: "dest=/etc/irods/database_config.json regexp='testpassword' replace='    \"db_password\": \"{{ config.irods.users.primary.password }}\",' backup=yes"
 
 - name: Modify configuration file
   shell: "sed '1,2d' {{ dl_dir }}/setup_irods > {{ dl_dir }}/setup_irods_mod"
@@ -135,12 +119,12 @@
   when: irods_config.stdout.find("exactly") != -1
 
 - name: Re-configure iRODS service
-  shell: "/var/lib/irods/packaging/setup_irods.sh < {{ dl_dir }}/setup_irods_mod"
+  shell: "{{ config.irods.path }}/packaging/setup_irods.sh < {{ dl_dir }}/setup_irods_mod"
   register: irods_reconfig
   ignore_errors: true
   when: irods_config.stdout.find("exactly") != -1
 
 - name: Configure iCommands for administration
-  become_user: "{{ irods_admin_user }}" 
+  become_user: "{{ config.irods.users.admin.username }}" 
   shell: "iinit < {{ dl_dir }}/setup_icommands"
   ignore_errors: true

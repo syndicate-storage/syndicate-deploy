@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Create users
-rabbitmqctl add_user {{ amqp.user }} {{ amqp.password }}
+rabbitmqctl add_user {{ config.amqp.user }} {{ config.amqp.password }}
 
 # Create vhost
 rabbitmqctl add_vhost /irods/useraccess
 
 # Set user rights
-rabbitmqctl set_user_tags {{ amqp.user }} administrator
-rabbitmqctl set_permissions -p / {{ amqp.user }} ".*" ".*" ".*"
-rabbitmqctl set_permissions -p /irods/useraccess {{ amqp.user }} ".*" ".*" ".*"
+rabbitmqctl set_user_tags {{ config.amqp.user }} administrator
+rabbitmqctl set_permissions -p / {{ config.amqp.user }} ".*" ".*" ".*"
+rabbitmqctl set_permissions -p /irods/useraccess {{ config.amqp.user }} ".*" ".*" ".*"
 

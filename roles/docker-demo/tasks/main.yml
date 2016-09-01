@@ -13,9 +13,17 @@
   command: docker ps -a --filter=status=running
   register: docker_running
   when: docker_images.stdout.find("demo") != -1
+  
+- set_fact:
+    packages: "{{ irods3_packages }}"
+  when: "{{ docker_preload_packages | bool }} and {{ irods_version | int }} == 3"
+
+- set_fact:
+    packages: "{{ irods4_packages }}"
+  when: "{{ docker_preload_packages | bool }} and {{ irods_version | int }} == 4"
 
 - name: Build docker host images
-  command: docker build -t {{ inventory_hostname }} ./roles/docker-demo/files/
+  command: "docker build --build-arg preload_packages={{ packages | default('') }} -t {{ inventory_hostname }} ./roles/docker-demo/files/"
   when: docker_images.stdout.find("demo") == -1
 
 - name: Run docker hosts

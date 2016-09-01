@@ -22,18 +22,18 @@
 #	the setup scripts again and they will use your changes.
 #
 #
-#	Warning:  After iRODS is built, some scripts, like irodsctl,
+#	Warning:  After iRODS is built, some scripts, like config.irods.tl,
 #	use this file to control their access to the database and
 #	iRODS.  If you change this file after iRODS is built, it
 #	may confuse the scripts and cause problems.
 #
 #	However, for the most part, the information in this script is
-#	used by 'irodssetup' to set up other configuration files and
+#	used by 'config.irods.etup' to set up other configuration files and
 #	ICAT database information, so to make a change after
 #	installation, use other iRODS or subsystem (such as ODBC)
 #	mechanisms.  Or, in rare cases in working with a new
 #	installation, you might update this file (the updated
-#	irods.config version) and then re-run irodssetup.
+#	irods.config version) and then re-run config.irods.etup.
 #
 
 
@@ -76,10 +76,10 @@ $DATABASE_EXCLUSIVE_TO_IRODS = '1';
 $DATABASE_HOME = '/usr/lib/postgresql/9.3';
 $DATABASE_LIB = 'lib';
 
-$DATABASE_HOST = '{{ irods.database.hostname }}';
-$DATABASE_PORT = '{{ irods.database.port }}';
-$DATABASE_ADMIN_NAME = '{{ irods.users.primary.username }}';
-$DATABASE_ADMIN_PASSWORD = '{{ irods.users.primary.password }}';
+$DATABASE_HOST = '{{ config.database.hostname }}';
+$DATABASE_PORT = '{{ config.database.port }}';
+$DATABASE_ADMIN_NAME = '{{ config.irods.users.primary.username }}';
+$DATABASE_ADMIN_PASSWORD = '{{ config.irods.users.primary.password }}';
 
 
 
@@ -119,19 +119,19 @@ $DATABASE_ADMIN_PASSWORD = '{{ irods.users.primary.password }}';
 #  $GLOBUS_LOCATION is then the GLOBUS_LOCATION, and
 #  $GSI_INSTALL_TYPE is the Globus/GSI install type to use.
 #
-$IRODS_HOME = '{{ irods.path }}/iRODS';
-$IRODS_PORT = '{{ irods.port.main }}';
-$SVR_PORT_RANGE_START = '{{ irods.port.file_tx_range_begin }}';
-$SVR_PORT_RANGE_END = '{{ irods.port.file_tx_range_end }}';
-$IRODS_ADMIN_NAME = '{{ irods.users.admin.username }}';
-$IRODS_ADMIN_PASSWORD = '{{ irods.users.admin.password }}';
+$IRODS_HOME = '{{ config.irods.path }}/iRODS';
+$IRODS_PORT = '{{ config.irods.port.main }}';
+$SVR_PORT_RANGE_START = '{{ config.irods.port.file_tx_range_begin }}';
+$SVR_PORT_RANGE_END = '{{ config.irods.port.file_tx_range_end }}';
+$IRODS_ADMIN_NAME = '{{ config.irods.users.admin.username }}';
+$IRODS_ADMIN_PASSWORD = '{{ config.irods.users.admin.password }}';
 $IRODS_ICAT_HOST = '';
 
-$DB_NAME = '{{ irods.database.name }}';
-$RESOURCE_NAME = '{{ irods.server.resource_name }}';
-$RESOURCE_DIR = '{{ irods.server.vault_dir }}';
-$ZONE_NAME = '{{ irods.server.zone }}';
-$DB_KEY = '{{ irods.users.primary.password }}';
+$DB_NAME = '{{ config.database.name }}';
+$RESOURCE_NAME = '{{ config.irods.resource_name }}';
+$RESOURCE_DIR = '{{ config.irods.vault_dir }}';
+$ZONE_NAME = '{{ config.irods.zone }}';
+$DB_KEY = '{{ config.irods.users.primary.password }}';
 
 $GSI_AUTH = '0';
 $GLOBUS_LOCATION = '';

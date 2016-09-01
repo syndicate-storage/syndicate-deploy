@@ -10,11 +10,11 @@ acSetRescSchemeForCreate {
 
 acSetRescSchemeForRepl { msiSetDefaultResc("iplantRG","preferred"); }
 
-ipc_AMQP_HOST = {{ amqp_host }}
-ipc_AMQP_PORT = {{ amqp_port }}
-ipc_AMQP_USER = {{ amqp_user }}
-ipc_AMQP_PASSWORD = {{ amqp_password }}
+ipc_AMQP_HOST = {{ config.amqp.host }}
+ipc_AMQP_PORT = {{ config.amqp.port }}
+ipc_AMQP_USER = {{ config.amqp.user }}
+ipc_AMQP_PASSWORD = {{ config.amqp.password }}
 ipc_AMQP_EPHEMERAL = false
 
-ipc_RODSADMIN = {{ irods_admin_user }}
-ipc_RE_HOST = localhost
+ipc_RODSADMIN = {{ config.irods.users.admin.username }}
+ipc_RE_HOST = {{ config.amqp.host }}
