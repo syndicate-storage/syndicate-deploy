@@ -1,6 +1,12 @@
 ---
 # Install demo systems
 
+- name: Include default variables
+  hosts: all
+  tasks:
+  - include_vars: vars/irods_version.yml
+  - include_vars: vars/docker_preload_packages.yml
+
 - name: Prep systems
   hosts: demo
   become: yes
@@ -8,6 +14,13 @@
     - common-prep
     - ssh-lockdown
     - ufw
+
+- name: Install iRODS
+  hosts: irods
+  become: yes
+  roles:
+    - { role: irods3, when: irods_version == 3 }
+    - { role: irods4, when: irods_version == 4 }
 
 - name: Install Hadoop
   hosts: hadoop
@@ -27,10 +40,3 @@
   hosts: demo
   roles:
     - syndicate
-
-- name: Install iRODS
-  hosts: irods
-  become: yes
-  roles:
-    - irods
-
