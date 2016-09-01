@@ -1,5 +1,5 @@
 ---
 # Set the default iRODS version to be installed
-# this can be over written with "-e irods_version=<version>" at the command line
+# this can be set at the command line with "-e irods_version=<version>"
 
 irods_version: 3
