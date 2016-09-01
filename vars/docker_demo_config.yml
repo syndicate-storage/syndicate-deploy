@@ -1,8 +1,12 @@
 ---
+# Docker demo configuration options
+
 # Allows the docker image to be preloaded with the packages that are necessary for the selected version of iRODS. This can save considerable time if the ansible install is to be tested multiple time via docker.
 # This can be set at the command line with "-e docker_preload_packages=<true|false>"
-
 docker_preload_packages: false
+
+# The time which each docker container remains up/running
+docker_container_uptime: 7d
 
 # Specify the packages to pre-load
 irods3_packages: "'ant build-essential git odbc-postgresql openjdk-7-jdk postgresql-9.3 python-pika python-psycopg2 rabbitmq-server unixodbc-dev unzip uuid-dev uuid-runtime'"

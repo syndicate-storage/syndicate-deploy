@@ -33,5 +33,5 @@
     state: reloaded
     use_tls: "encrypt"
     publish_all_ports: yes
-    command: sleep 7d
+    command: "sleep {{ docker_container_uptime }}"
   when: docker_running.changed == false or docker_running.stdout.find("demo") == -1

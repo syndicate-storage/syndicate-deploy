@@ -17,9 +17,11 @@ $ ansible-playbook -i inventory/demo-example demo-playbook.yml
 ######Install Options:
 
 * "-e irods\_version=\<version number\>"
-  - Specify the iRODS version to install
+  - Specify the iRODS version to install (default = "3")
 * "-e docker\_preload\_packages=\<true|false\>"
-  - Only for Docker, tell docker to pre-load prerequisite iRODS packages to the docker image (saves time if you plan to run multiple iRODS install tests)
+  - Only for Docker, tell docker to pre-load prerequisite iRODS packages to the docker image (saves time if you plan to run multiple iRODS install tests, default = "false")
+* "-e docker\_container\_uptime=\<time\>"
+  - Only for Docker, specify the time for the docker containers to remain up / running (default = "7d")
 
 
 ## `jenkins-playbook.yml`

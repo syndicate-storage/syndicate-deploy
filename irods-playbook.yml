@@ -5,7 +5,6 @@
   hosts: irods
   tasks:
   - include_vars: vars/irods_version.yml
-  - include_vars: vars/docker_preload_packages.yml
 
 - name: Install iRODS
   hosts: irods

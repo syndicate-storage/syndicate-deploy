@@ -6,7 +6,7 @@
   connection: local
   tasks:
   - include_vars: vars/irods_version.yml
-  - include_vars: vars/docker_preload_packages.yml
+  - include_vars: vars/docker_demo_config.yml
 
 - name: Build docker containers
   hosts: all
