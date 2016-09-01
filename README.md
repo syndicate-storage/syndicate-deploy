@@ -1,4 +1,17 @@
-# Deployment support ansible roles for Syndicate project
+# Demo deployment support for Syndicate project
+
+## `Deploy the "demo" environment to Docker`
+
+```
+$ ansible-playbook -i inventory/docker-demo-example docker-demo.yml
+```
+
+Options:
+
+* "-e irods\_version=\<version number\>"
+  - Specify the iRODS version to install
+* "-e docker\_preload\_packages=\<true|false\>"
+  - Tell docker to pre-load prerequisite iRODS packages to the docker image (saves time if you plan to run multiple iRODS install tests)
 
 ## `jenkins-playbook.yml`
 
