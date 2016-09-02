@@ -41,7 +41,7 @@ config:
 
 # Download defaults
 dl_dir: /opt/downloads
-    
+
 prereq_packages:
   - ant
   - build-essential

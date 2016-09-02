@@ -25,7 +25,7 @@
     name: "{{ item }}"
     state: started
     enabled: yes
-  with_items: "{{ prereq_enable_services }}" 
+  with_items: "{{ prereq_enable_services }}"
 
 - name: Download install packages
   get_url:
@@ -45,9 +45,11 @@
   when: get_url_status.changed == false
 
 - name: wget iRODS package, if download failed
-  command: wget -N {{ item.src }} -P {{ item.dest }} 
+  command: wget -N {{ item.src }} -P {{ item.dest }}
   with_items: "{{ downloads.irods }}"
   when: get_url_status.changed == false
+  tags:
+  - skip_ansible_lint #may require wget due to a bug with get_url
 
 - name: Install iRODS
   apt:
@@ -66,12 +68,12 @@
   file:
     path: "{{ item.value.dest|dirname }}"
     state: directory
-  when: item.value.dest != "" 
+  when: item.value.dest != ""
   with_dict: "{{ repos }}"
 
 - name: Install Cyverse setAVU module
   command: "cp -r {{ dl_dir }}/{{ item.value.src | basename }} {{ item.value.dest }}"
-  when: item.value.dest != "" 
+  when: item.value.dest != ""
   args:
     creates: "{{ item.value.dest }}"
   with_dict: "{{ repos }}"
@@ -125,6 +127,6 @@
   when: irods_config.stdout.find("exactly") != -1
 
 - name: Configure iCommands for administration
-  become_user: "{{ config.irods.users.admin.username }}" 
+  become_user: "{{ config.irods.users.admin.username }}"
   shell: "iinit < {{ dl_dir }}/setup_icommands"
   ignore_errors: true

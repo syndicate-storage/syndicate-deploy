@@ -1,7 +1,7 @@
 ---
 # file: roles/docker-demo/tasks/main.yml
 
-# Use docker build with a Dockerfile so we can build a 
+# Use docker build with a Dockerfile so we can build a
 # custom docker image (in this case, includes python
 # since python is required for the docker module)
 
@@ -13,12 +13,14 @@
   command: docker ps -a --filter=status=running
   register: docker_running
   when: docker_images.stdout.find("demo") != -1
-  
-- set_fact:
+
+- name: Define package installs for iRODS v3 Docker image
+  set_fact:
     packages: "{{ irods3_packages }}"
   when: "{{ docker_preload_packages | bool }} and {{ irods_version | int }} == 3"
 
-- set_fact:
+- name: Define package installs for iRODS v4 Docker image
+  set_fact:
     packages: "{{ irods4_packages }}"
   when: "{{ docker_preload_packages | bool }} and {{ irods_version | int }} == 4"
 

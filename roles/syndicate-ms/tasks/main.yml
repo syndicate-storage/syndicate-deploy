@@ -23,7 +23,7 @@
     state: directory
 
 - name: Get the google app engine
-  get_url: 
+  get_url:
     url: "{{ GAE_SDK }}"
     dest: "{{ dl_dir }}/{{ GAE_SDK | basename }}"
 
@@ -34,10 +34,11 @@
   ignore_errors: true
   register: gae_install_status
 
-#check if unarchive failed (bug)
-- stat: 
+- name: Check if GAE install failed due to the unarchive bug
+  stat:
     path: "{{ gae_path }}"
   register: gae_path_status
+
 - name: Install GAE, try again
   shell: "cd /home/{{ syndicate_user }} && unzip {{ dl_dir }}/{{ GAE_SDK | basename }}"
   when: gae_install_status.failed == true and ( gae_path_status.stat.isdir is not defined or gae_path_status.stat.isdir == false )
@@ -65,10 +66,10 @@
 
 - name: Install syndicate-ms packages
   apt:
-    name: "{{ item }}" 
+    name: "{{ item }}"
     update_cache: yes
     cache_valid_time: 3600
-    state: latest
+    state: present
   with_items:
     - syndicate-ms
 
@@ -84,7 +85,7 @@
 
 - name: Copy syndicate-ms files
   copy:
-    src: "{{ item }}" 
+    src: "{{ item }}"
     dest: "{{ ms_path }}"
     owner: "{{ syndicate_user }}"
   with_items:
@@ -93,7 +94,10 @@
     - Makefile
 
 - name: Configure syndicate-ms
-  shell: "cd {{ ms_path }} && make all"
+  command: "make all"
+  args:
+    chdir: "{{ ms_path }}"
+    creates: "{{ ms_path }}/app.yaml"
 
 - name: Start syndicate-ms
-  shell: "daemon -- {{ gae_path }}/{{ gae_cmd }}"
+  command: "daemon -- {{ gae_path }}/{{ gae_cmd }}"

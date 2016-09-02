@@ -42,7 +42,7 @@ config:
 
 # Download defaults
 dl_dir: /opt/downloads
-    
+
 # Prerequisite packages
 prereq_packages:
   - git

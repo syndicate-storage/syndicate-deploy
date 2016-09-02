@@ -4,7 +4,8 @@
 - name: Include default variables
   hosts: all
   tasks:
-  - include_vars: vars/irods_version.yml
+  - name: iRODS version
+    include_vars: vars/irods_version.yml
 
 - name: Prep systems
   hosts: demo

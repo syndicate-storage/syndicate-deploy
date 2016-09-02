@@ -34,7 +34,7 @@
     name: "{{ item }}"
     state: started
     enabled: yes
-  with_items: "{{ prereq_enable_services }}" 
+  with_items: "{{ prereq_enable_services }}"
 
 - name: Download and uncompress install zip files
   unarchive:
@@ -43,7 +43,8 @@
     copy: no   #the "copy" option will be depricated but this doesn't work with it's replacement ("remote_src"), so this will fail in the future
   with_dict: "{{ downloads }}"
 
-- stat: 
+- name: Check if iRODS has already been installed
+  stat:
     path: "{{ config.irods.path }}"
   register: irodspath_stat
 
@@ -57,7 +58,8 @@
     state: directory
   with_dict: "{{ downloads }}"
 
-- stat: 
+- name: Check if setAVU has already been installed
+  stat:
     path: "{{ downloads.setavu.dest }}"
   register: setavupath_stat
 
@@ -65,7 +67,8 @@
   command: "cp -r {{ dl_dir }}/{{ downloads.setavu.creates }} {{ downloads.setavu.dest }}"
   when: setavupath_stat.stat.exists == False
 
-- stat: 
+- name: Check if BMS has already been installed
+  stat:
     path: "{{ downloads.bms.dest }}"
   register: bmspath_stat
 
@@ -81,14 +84,18 @@
   with_items: "{{ templates }}"
 
 - name: Change iRODS path ownership
-  command: "chown -R {{ config.irods.users.primary.username }}:{{ config.irods.users.primary.username }} {{ config.irods.path }}"
+  file:
+    dest: "{{ config.irods.path }}"
+    owner: "{{ config.irods.users.primary.username }}"
+    group: "{{ config.irods.users.primary.username }}"
+    recurse: yes
 
 - name: Configure Postgres DB for iRODS
   command: "{{ config.irods.path }}/setup_postgres.sh"
 
 - name: Configure RabbitMQ for iRODS
   command: "{{ config.irods.path }}/setup_rabbitMQ.sh"
-    
+
 - name: Compile, setup and start iRODS service
   shell: "yes | ./irodssetup"
   become_user: "{{ config.irods.users.primary.username }}"

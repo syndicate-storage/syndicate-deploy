@@ -55,6 +55,8 @@
   command: "tar -xzf {{ hadoop_dl.dest }} -C {{ hadoop_home }} --strip-components=1"
   args:
     creates: "{{ hadoop_home }}/share"
+  tags:
+  - skip_ansible_lint #skip lint error due to strip-components bug
 
 - name: Make Hadoop subdirs
   file:
