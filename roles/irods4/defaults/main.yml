@@ -4,42 +4,32 @@
 
 # iRODS configuration defaults
 
-irods_path: "/var/lib/irods"
+config_amqp_host: 'localhost'
+config_amqp_port: 5672
+config_amqp_user: 'irods_ampq_user'
+config_amqp_password: 'irods_ampq_pass'
 
-config:
-  amqp:
-    host: 'localhost'
-    port: 5672
-    user: 'irods_ampq_user'
-    password: 'irods_ampq_pass'
-  database:
-    name: iCAT
-    hostname: localhost
-    port: 5432
-  irods:
-    key:
-      zone: TEMPORARY_zone_key
-      negotiation: TEMPORARY_32byte_negotiation_key
-      control_plane: TEMPORARY__32byte_ctrl_plane_key
-    path: "{{ irods_path }}"
-    port:
-      main: 1247
-      control_plane: 1248
-      file_tx_range_begin: 20000
-      file_tx_range_end: 20199
-    resource_name: demoResc
-    vault_dir: "{{ irods_path }}/iRODS/Vault"
-    validation_base_url: "off"
-    zone: iplant
-    users:
-      primary:
-        username: irods_user
-        password: ievieicefue9o
-      admin:
-        username: irods_admin
-        password: phia*sooNgu9
+config_database_name: iCAT
+config_database_hostname: localhost
+config_database_port: 5432
 
-
+config_irods_key_zone: TEMPORARY_zone_key
+config_irods_key_negotiation: TEMPORARY_32byte_negotiation_key
+config_irods_key_controlplane: TEMPORARY_32byte_ctrl_plane_key
+config_irods_path: "/var/lib/irods"
+config_irods_port_main: 1247
+config_irods_port_controlplane: 1248
+config_irods_port_filetxrangebegin: 20000
+config_irods_port_filetxrangeend: 20199
+config_irods_resourcename: demoResc
+config_irods_users_primary_username: irods_user
+config_irods_users_primary_password: ievieicefue9o
+config_irods_users_admin_username: irods_admin
+config_irods_users_admin_password: phia*sooNgu9
+config_irods_vaultdir: "{{ config_irods_path }}/iRODS/Vault"
+config_irods_validationbaseurl: "off"
+config_irods_zone: iplant
+      
 # Download defaults
 dl_dir: /opt/downloads
 
@@ -67,37 +57,10 @@ downloads:
       dest: "{{ dl_dir }}"
       creates: "irods-database-plugin-postgres-1.8-ubuntu14-x86_64.deb"
 
-repos:
+irods_repos:
   setavu:
     src: "https://github.com/cyverse/irods-setavu-mod"
     dest: "{{ irods_path }}/iRODS/modules/setavu"
   cmd_scripts:
     src: "https://github.com/cyverse/irods-cmd-scripts"
     dest: ""
-
-# template information
-templates:
-  - src: reConfigs/ipc-amqp.re.j2
-    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-amqp.re"
-    mode: "u=rw,g=r,o=r"
-  - src: reConfigs/ipc-custom.re.j2
-    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-custom.re"
-    mode: "u=rw,g=r,o=r"
-  - src: reConfigs/ipc-env.re.j2
-    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-env.re"
-    mode: "u=rw,g=r,o=r"
-  - src: reConfigs/ipc-json.re.j2
-    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-json.re"
-    mode: "u=rw,g=r,o=r"
-  - src: reConfigs/ipc-logic.re.j2
-    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-logic.re"
-    mode: "u=rw,g=r,o=r"
-  - src: reConfigs/ipc-uuid.re.j2
-    dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-uuid.re"
-    mode: "u=rw,g=r,o=r"
-  - src: setup_icommands.j2
-    dest: "{{ dl_dir }}/setup_icommands"
-    mode: "u=rw,g=r,o=r"
-  - src: setup_irods.j2
-    dest: "{{ dl_dir }}/setup_irods"
-    mode: "u=rw,g=r,o=r"

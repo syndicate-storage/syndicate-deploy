@@ -1,6 +1,6 @@
 -- creates db, default config.irods.role with all privileges.
-DROP DATABASE IF EXISTS "{{ config.database.name }}";
-CREATE DATABASE "{{ config.database.name }}";
+DROP DATABASE IF EXISTS "{{ config_database_name }}";
+CREATE DATABASE "{{ config_database_name }}";
 
 DO
 $body$
@@ -8,12 +8,12 @@ BEGIN
    IF NOT EXISTS (
       SELECT *
       FROM   pg_catalog.pg_user
-      WHERE  usename = '{{ config.irods.users.primary.username }}') THEN
+      WHERE  usename = '{{ config_irods_users_primary_username }}') THEN
 
-      CREATE USER {{ config.irods.users.primary.username }} WITH PASSWORD '{{ config.irods.users.primary.password }}';
+      CREATE USER {{ config_irods_users_primary_username }} WITH PASSWORD '{{ config_irods_users_primary_password }}';
    END IF;
 END
 $body$;
 
-GRANT ALL PRIVILEGES ON DATABASE "{{ config.database.name }}" to {{ config.irods.users.primary.username }};
+GRANT ALL PRIVILEGES ON DATABASE "{{ config_database_name }}" to {{ config_irods_users_primary_username }};
 

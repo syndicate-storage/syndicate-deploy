@@ -76,10 +76,10 @@ $DATABASE_EXCLUSIVE_TO_IRODS = '1';
 $DATABASE_HOME = '/usr/lib/postgresql/9.3';
 $DATABASE_LIB = 'lib';
 
-$DATABASE_HOST = '{{ config.database.hostname }}';
-$DATABASE_PORT = '{{ config.database.port }}';
-$DATABASE_ADMIN_NAME = '{{ config.irods.users.primary.username }}';
-$DATABASE_ADMIN_PASSWORD = '{{ config.irods.users.primary.password }}';
+$DATABASE_HOST = '{{ config_database_hostname }}';
+$DATABASE_PORT = '{{ config_database_port }}';
+$DATABASE_ADMIN_NAME = '{{ config_irods_users_primary_username }}';
+$DATABASE_ADMIN_PASSWORD = '{{ config_irods_users_primary_password }}';
 
 
 
@@ -119,19 +119,19 @@ $DATABASE_ADMIN_PASSWORD = '{{ config.irods.users.primary.password }}';
 #  $GLOBUS_LOCATION is then the GLOBUS_LOCATION, and
 #  $GSI_INSTALL_TYPE is the Globus/GSI install type to use.
 #
-$IRODS_HOME = '{{ config.irods.path }}/iRODS';
-$IRODS_PORT = '{{ config.irods.port.main }}';
-$SVR_PORT_RANGE_START = '{{ config.irods.port.file_tx_range_begin }}';
-$SVR_PORT_RANGE_END = '{{ config.irods.port.file_tx_range_end }}';
-$IRODS_ADMIN_NAME = '{{ config.irods.users.admin.username }}';
-$IRODS_ADMIN_PASSWORD = '{{ config.irods.users.admin.password }}';
+$IRODS_HOME = '{{ config_irods_path }}/iRODS';
+$IRODS_PORT = '{{ config_irods_port_main }}';
+$SVR_PORT_RANGE_START = '{{ config_irods_port_filetxrangebegin }}';
+$SVR_PORT_RANGE_END = '{{ config_irods_port_filetxrangeend }}';
+$IRODS_ADMIN_NAME = '{{ config_irods_users_admin_username }}';
+$IRODS_ADMIN_PASSWORD = '{{ config_irods_users_admin_password }}';
 $IRODS_ICAT_HOST = '';
 
-$DB_NAME = '{{ config.database.name }}';
-$RESOURCE_NAME = '{{ config.irods.resource_name }}';
-$RESOURCE_DIR = '{{ config.irods.vault_dir }}';
-$ZONE_NAME = '{{ config.irods.zone }}';
-$DB_KEY = '{{ config.irods.users.primary.password }}';
+$DB_NAME = '{{ config_database_name }}';
+$RESOURCE_NAME = '{{ config_irods_resourcename }}';
+$RESOURCE_DIR = '{{ config_irods_vaultdir }}';
+$ZONE_NAME = '{{ config_irods_zone }}';
+$DB_KEY = '{{ config_irods_users_primary_password }}';
 
 $GSI_AUTH = '0';
 $GLOBUS_LOCATION = '';
