@@ -2,19 +2,19 @@
 
 ## `Deploy the "demo" environment`
 
-####Deploy to Docker
+###Deploy to Docker
 
 ```
 $ ansible-playbook -i inventory/docker-demo-example docker-demo.yml
 ```
 
-####Deploy to hardware (i.e. demo1 & demo2)
+###Deploy to hardware (i.e. demo1 & demo2)
 
 ```
 $ ansible-playbook -i inventory/demo-example demo-playbook.yml
 ```
 
-######Install Options:
+#####Install Options:
 
 * "-e irods\_version=\<version number\>"
   - Specify the iRODS version to install (default = "3")
@@ -23,6 +23,15 @@ $ ansible-playbook -i inventory/demo-example demo-playbook.yml
 * "-e docker\_container\_uptime=\<time\>"
   - Only for Docker, specify the time for the docker containers to remain up / running (default = "7d")
 
+##Perform Demo Tests
+
+* Login to the syndicate client test node (docker-synclient1) and run tests
+ 
+```
+docker exec -it docker-synclient1 bash
+su - syndicate
+cd /opt/demo-tests && ./testwrapper.sh
+```
 
 ## `jenkins-playbook.yml`
 
