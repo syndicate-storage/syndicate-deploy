@@ -106,22 +106,22 @@
     mode: "{{ item.mode }}"
   with_items:
     - src: reConfigs/ipc-amqp.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-amqp.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-amqp.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/ipc-custom.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-custom.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-custom.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/ipc-env.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-env.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-env.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/ipc-json.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-json.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-json.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/ipc-logic.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-logic.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-logic.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/ipc-uuid.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-uuid.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-uuid.re"
       mode: "u=rw,g=r,o=r"
     - src: setup_icommands.j2
       dest: "{{ dl_dir }}/setup_icommands"

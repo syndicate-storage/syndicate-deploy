@@ -83,52 +83,52 @@
     mode: "{{ item.mode }}"
   with_items:
     - src: reConfigs/ipc-amqp.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-amqp.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-amqp.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/ipc-custom.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-custom.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-custom.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/ipc-env.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-env.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-env.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/ipc-json.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-json.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-json.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/ipc-logic.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-logic.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-logic.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/ipc-uuid.re.j2
-      dest: "{{ irods_path }}/iRODS/server/config/reConfigs/ipc-uuid.re"
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-uuid.re"
       mode: "u=rw,g=r,o=r"
     - src: reConfigs/server.config.in.j2
-      dest: "{{ irods_path }}/iRODS/server/config/server.config.in"
+      dest: "{{ config_irods_path }}/iRODS/server/config/server.config.in"
       mode: "u=rw,g=r,o=r"
     - src: commands/amqptopicsend.py.j2
-      dest: "{{ irods_path }}/iRODS/server/bin/cmd/amqptopicsend.py"
+      dest: "{{ config_irods_path }}/iRODS/server/bin/cmd/amqptopicsend.py"
       mode: "u=rwx,g=rw,o=rw"
     - src: commands/generateuuid.sh.j2
-      dest: "{{ irods_path }}/iRODS/server/bin/cmd/generateuuid.sh"
+      dest: "{{ config_irods_path }}/iRODS/server/bin/cmd/generateuuid.sh"
       mode: "u=rwx,g=rw,o=rw"
     - src: setup.sql.j2
-      dest: "{{ irods_path }}/setup.sql"
+      dest: "{{ config_irods_path }}/setup.sql"
       mode: "u=rwx,g=rwx,o=rx"
     - src: setup_postgres.sh.j2
-      dest: "{{ irods_path }}/setup_postgres.sh"
+      dest: "{{ config_irods_path }}/setup_postgres.sh"
       mode: "u=rwx,g=rwx,o=rx"
     - src: setup_rabbitMQ.sh.j2
-      dest: "{{ irods_path }}/setup_rabbitMQ.sh"
+      dest: "{{ config_irods_path }}/setup_rabbitMQ.sh"
       mode: "u=rwx,g=rwx,o=rx"
     - src: irods.config.j2
-      dest: "{{ irods_path }}/iRODS/config/irods.config"
+      dest: "{{ config_irods_path }}/iRODS/config/irods.config"
       mode: "u=rw,g=r,o=r"
     - src: odbc.ini.j2
-      dest: "{{ irods_path }}/.odbc.ini"
+      dest: "{{ config_irods_path }}/.odbc.ini"
       mode: "u=rw,g=r,o=r"
     - src: bms.config.j2
-      dest: "{{ irods_path }}/bms/bms.config"
+      dest: "{{ config_irods_path }}/bms/bms.config"
       mode: "u=rwx,g=rwx,o=rx"
     - src: collection.c.j2
-      dest: "{{ irods_path }}/iRODS/server/core/src/"
+      dest: "{{ config_irods_path }}/iRODS/server/core/src/"
       mode: "u=rw,g=r,o=r"
 
 - name: Change iRODS path ownership

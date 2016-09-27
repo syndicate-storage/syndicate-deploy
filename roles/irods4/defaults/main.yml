@@ -29,7 +29,7 @@ config_irods_users_admin_password: phia*sooNgu9
 config_irods_vaultdir: "{{ config_irods_path }}/iRODS/Vault"
 config_irods_validationbaseurl: "off"
 config_irods_zone: iplant
-      
+
 # Download defaults
 dl_dir: /opt/downloads
 
@@ -60,7 +60,7 @@ downloads:
 irods_repos:
   setavu:
     src: "https://github.com/cyverse/irods-setavu-mod"
-    dest: "{{ irods_path }}/iRODS/modules/setavu"
+    dest: "{{ config_irods_path }}/iRODS/modules/setavu"
   cmd_scripts:
     src: "https://github.com/cyverse/irods-cmd-scripts"
     dest: ""
