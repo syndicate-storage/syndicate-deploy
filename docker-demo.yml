@@ -17,7 +17,7 @@
     - docker-demo
 
 - name: Prep systems
-  hosts: demo
+  hosts: all
   connection: docker
   become: yes
   roles:
