@@ -10,7 +10,7 @@ BUILD_MS ?=
 KEY_FILES ?= $(CONFIG_DIR)
 
 MS_APP_NAME			?= syndicate-ms
-MS_APP_PUBLIC_HOST	?= localhost
+MS_APP_PUBLIC_HOST	?= ms
 MS_APP_ADMIN_EMAIL	?= syndicate-ms@example.com
 
 MS_APP_ADMIN_PUBLIC_KEY		?= $(KEY_FILES)/admin.pub
