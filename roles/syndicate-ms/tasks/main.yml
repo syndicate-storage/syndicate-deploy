@@ -73,16 +73,6 @@
   with_items:
     - syndicate-ms
 
-- name: Adjust syndicate directory ownerships
-  file:
-    path: "{{ item }}"
-    owner: "{{ syndicate_user }}"
-    recurse: yes
-    state: directory
-  with_items:
-    - "{{ datastore_path }}"
-    - "{{ ms_path }}"
-
 - name: Copy syndicate-ms files
   copy:
     src: "{{ item }}"
@@ -98,6 +88,43 @@
   args:
     chdir: "{{ ms_path }}"
     creates: "{{ ms_path }}/app.yaml"
+
+- name: Adjust syndicate directory ownerships
+  file:
+    path: "{{ item }}"
+    owner: "{{ syndicate_user }}"
+    group: "{{ syndicate_user }}"
+    mode: "u=rwx,g=rx,o=rx"
+    recurse: yes
+    state: directory
+  with_items:
+    - "/home/{{ syndicate_user }}"
+    - "{{ ms_path }}"
+
+- name: Fetch syndicate certs for demo-test
+  fetch:
+    src: "{{ ms_path }}/{{ item }}"
+    dest: "/tmp/"
+    flat: yes
+  with_items:
+    - admin.pub
+    - admin.pem
+    - syndicate.pub
+    - syndicate.pem
+  when: inventory_hostname in groups['syndicate-ms']
+
+- name: Link syndicate certs
+  file:
+    src: "/opt/ms_certs/{{ item }}"
+    dest: "{{ ms_path }}/{{ item }}"
+    state: link
+    force: yes
+  with_items:
+    - admin.pub
+    - admin.pem
+    - syndicate.pub
+    - syndicate.pem
+  when: inventory_hostname not in groups['syndicate-ms']
 
 - name: Start syndicate-ms
   command: "daemon -- {{ gae_path }}/{{ gae_cmd }}"
