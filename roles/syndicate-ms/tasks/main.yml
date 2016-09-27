@@ -127,4 +127,6 @@
   when: inventory_hostname not in groups['syndicate-ms']
 
 - name: Start syndicate-ms
+  become_user: "{{ syndicate_user }}"
   command: "daemon -- {{ gae_path }}/{{ gae_cmd }}"
+  when: inventory_hostname in groups['syndicate-ms']

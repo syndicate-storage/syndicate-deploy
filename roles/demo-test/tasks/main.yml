@@ -1,0 +1,61 @@
+---
+# demo-test/tasks/main.yml
+# Configures the demo test environment
+
+- name: Install test dependency packages
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: present
+  with_items:
+    - valgrind
+    - python-pip
+
+- name: Install yaml from PyPi
+  become: yes
+  pip:
+    name=pyyaml
+
+- name: Copy test files
+  copy:
+    src: demo-tests
+    dest: /opt
+    owner: syndicate
+    group: syndicate
+    directory_mode: "u=rwx,g=rx,o=rx"
+
+- name: Copy legacy test files
+  copy:
+    src: legacy-tests
+    dest: /opt
+    owner: syndicate
+    group: syndicate
+    directory_mode: "u=rwx,g=rx,o=rx"
+
+- name: Fix script permissions
+  command: 'find /opt \( -name "*.py" -o -name "*.sh" \) -exec chmod +x {} \;'
+
+- name: Create test results directories
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: syndicate
+    group: syndicate
+  with_items:
+    - /opt/demo-tests/results
+    - /opt/demo-tests/output
+    - /opt/legacy-tests/results
+    - /opt/legacy-tests/output
+
+- name: Get syndicate-ms certs
+  copy:
+    src: "/tmp/{{ item }}"
+    dest: "/opt/ms_certs/"
+    owner: syndicate
+    group: syndicate
+  with_items:
+    - admin.pub
+    - admin.pem
+    - syndicate.pub
+    - syndicate.pem
