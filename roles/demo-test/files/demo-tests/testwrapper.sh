@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs syndicate tests in PATHDIR, puts TAP results in TESTDIR
 
-TESTDIR=./tests
+TESTDIR=./syndicate-tests
 RESULTDIR=./results
 OUTPUTDIR=./output
 BASH=/bin/bash
