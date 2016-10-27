@@ -5,7 +5,8 @@
   hosts: all
   become: yes
   tasks:
-    - include_vars: vars/users.yml
+    - name: Include user variables
+      include_vars: vars/users.yml
 
 - name: provision users
   hosts: all

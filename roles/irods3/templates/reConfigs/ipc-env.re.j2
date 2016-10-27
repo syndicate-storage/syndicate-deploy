@@ -1,0 +1,20 @@
+# VERSION: 4
+#
+# The production environment rule customizations belong in this file.
+
+
+acSetRescSchemeForCreate {
+    msiSetDefaultResc("iplantRG","preferred");
+    msiSetRescSortScheme("random");
+}
+
+acSetRescSchemeForRepl { msiSetDefaultResc("iplantRG","preferred"); }
+
+ipc_AMQP_HOST = {{ config_amqp_host }}
+ipc_AMQP_PORT = {{ config_amqp_port }}
+ipc_AMQP_USER = {{ config_amqp_user }}
+ipc_AMQP_PASSWORD = {{ config_amqp_password }}
+ipc_AMQP_EPHEMERAL = false
+
+ipc_RODSADMIN = {{ config_irods_users_admin_username }}
+ipc_RE_HOST = {{ config_amqp_host }}

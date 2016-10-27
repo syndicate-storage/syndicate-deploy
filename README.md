@@ -1,4 +1,37 @@
-# Deployment support ansible roles for Syndicate project
+# Demo deployment support for Syndicate project
+
+## `Deploy the "demo" environment`
+
+###Deploy to Docker
+
+```
+$ ansible-playbook -i inventory/docker-demo-example docker-demo.yml
+```
+
+###Deploy to hardware (i.e. demo1 & demo2)
+
+```
+$ ansible-playbook -i inventory/demo-example demo-playbook.yml
+```
+
+#####Install Options:
+
+* "-e irods\_version=\<version number\>"
+  - Specify the iRODS version to install (default = "3")
+* "-e docker\_preload\_packages=\<true|false\>"
+  - Only for Docker, tell docker to pre-load prerequisite iRODS packages to the docker image (saves time if you plan to run multiple iRODS install tests, default = "false")
+* "-e docker\_container\_uptime=\<time\>"
+  - Only for Docker, specify the time for the docker containers to remain up / running (default = "7d")
+
+##Perform Demo Tests
+
+* Login to the syndicate client test node (docker-synclient1) and run tests
+ 
+```
+docker exec -it docker-synclient1 bash
+su - syndicate
+cd /opt/demo-tests && ./testwrapper.sh
+```
 
 ## `jenkins-playbook.yml`
 

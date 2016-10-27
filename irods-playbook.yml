@@ -1,9 +1,17 @@
 ---
 # install iRODS
 
-- hosts: irods
+- name: Include default variables
+  hosts: irods
+  tasks:
+  - name: iRODS version
+    include_vars: vars/irods_version.yml
+
+- name: Install iRODS
+  hosts: irods
   become: yes
   roles:
     - common-prep
     - ssh-lockdown
-    - irods
+    - { role: irods3, when: irods_version == 3 }
+    - { role: irods4, when: irods_version == 4 }

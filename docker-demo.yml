@@ -1,0 +1,59 @@
+---
+# Create and install docker demo systems
+
+- name: Include default variables
+  hosts: all
+  connection: local
+  tasks:
+  - name: iRODS version
+    include_vars: vars/irods_version.yml
+  - name: Docker configuration variables
+    include_vars: vars/docker_demo_config.yml
+
+- name: Build docker containers
+  hosts: all
+  connection: local
+  roles:
+    - docker-demo
+
+- name: Prep systems
+  hosts: all
+  connection: docker
+  become: yes
+  roles:
+    - common-prep
+
+- name: Install iRODS
+  hosts: irods
+  connection: docker
+  become: yes
+  roles:
+    - { role: irods3, when: irods_version == 3 }
+    - { role: irods4, when: irods_version == 4 }
+
+- name: Install Hadoop
+  hosts: hadoop
+  connection: docker
+  become: yes
+  roles:
+    - hadoop
+
+- name: Install Syndicate MS
+  hosts: syndicate-ms
+  connection: docker
+  become: yes
+  roles:
+    - syndicate-ms
+
+- name: Install Syndicate
+  hosts: docker-synclient1
+  connection: docker
+  roles:
+    - syndicate
+
+- name: Setup demo test environment
+  hosts: docker-synclient1
+  connection: docker
+  roles:
+    - syndicate-ms
+    - demo-test
