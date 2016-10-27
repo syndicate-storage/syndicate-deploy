@@ -16,9 +16,13 @@
 
 - name: Create iRODS users
   user:
-    name: "{{ item.value.username }}"
-    password: "{{ item.value.password | password_hash('sha512') }}"
-  with_dict: "{{ config_irods_users }}"
+    name: "{{ item.username }}"
+    password: "{{ item.password | password_hash('sha512') }}"
+  with_items:
+    - username: "{{ config_irods_users_primary_username }}"
+      password: "{{ config_irods_users_primary_password }}"
+    - username: "{{ config_irods_users_admin_username }}"
+      password: "{{ config_irods_users_admin_password }}"
 
 - name: Enable and start prerequisite services
   service:
