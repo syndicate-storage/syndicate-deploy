@@ -2,6 +2,17 @@
 # syndicate/tasks/main.yml
 # Installs syndicate packages
 
+- name: Prereqs and SSL support for apt for SSL
+  become: yes
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: installed
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+
 - name: Trust butler opencloud apt repo
   apt_key:
     data: "{{ lookup('file', 'butler_opencloud_cs_arizona_edu_pub.gpg') }}"
@@ -17,13 +28,6 @@
   when: ssl_key_added.changed
   command: "update-ca-certificates"
 
-- name: Enable apt over https
-  apt:
-    name: apt-transport-https
-    update_cache: yes
-    cache_valid_time: 3600
-    state: installed
-
 - name: Add apt repo for syndicate packages
   apt_repository:
     repo: "deb https://butler.opencloud.cs.arizona.edu/repos/release/syndicate syndicate main"
@@ -32,10 +36,10 @@
 
 - name: Install syndicate packages
   apt:
-    name: apt-transport-https
+    name: "{{ item }}"
     update_cache: yes
     cache_valid_time: 3600
-    state: latest
+    state: present
   with_items:
     - syndicate-core
     - syndicate-ug-tools

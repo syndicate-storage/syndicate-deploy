@@ -55,6 +55,8 @@
   command: "tar -xzf {{ hadoop_dl.dest }} -C {{ hadoop_home }} --strip-components=1"
   args:
     creates: "{{ hadoop_home }}/share"
+  tags:
+  - skip_ansible_lint #skip lint error due to strip-components bug
 
 - name: Make Hadoop subdirs
   file:
@@ -139,7 +141,7 @@
 
 - name: Format HDFS on namenode
   when: "inventory_hostname == groups['namenode'][0] and not hdfs_dn.stat.exists"
-  command: "{{ hadoop_home }}/bin/hadoop namenode -format"
+  shell: ". /etc/profile.d/java.sh && {{ hadoop_home }}/bin/hadoop namenode -format"
 
 - name: Start hadoop processes on namenode
   when: "inventory_hostname == groups['namenode'][0]"

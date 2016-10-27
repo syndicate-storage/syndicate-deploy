@@ -1,0 +1,171 @@
+---
+# irods/tasks/main.yml
+
+- name: Make downloads directory
+  file:
+    path: "{{ dl_dir }}"
+    state: directory
+
+- name: Install prerequisites
+  apt:
+    name={{ item }}
+    update_cache=yes
+    cache_valid_time=3600
+    state=installed
+  with_items: "{{ prereq_packages }}"
+
+- name: Create iRODS users
+  user:
+    name: "{{ item.value.username }}"
+    password: "{{ item.value.password | password_hash('sha512') }}"
+  with_dict: "{{ config_irods_users }}"
+
+- name: Enable RabbitMQ Management Plugin
+  command: rabbitmq-plugins enable rabbitmq_management
+
+- name: Link psqlodbca.so
+  file:
+    src: /usr/lib/x86_64-linux-gnu/odbc/psqlodbca.so
+    dest: /usr/lib/postgresql/9.3/lib/libodbcpsql.so
+    state: link
+
+- name: Enable and start prerequisite services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items: "{{ prereq_enable_services }}"
+
+- name: Download and uncompress install zip files
+  unarchive:
+    src: "{{ item.value.src }}"
+    dest: "{{ dl_dir }}"
+    copy: no   #the "copy" option will be depricated but this doesn't work with it's replacement ("remote_src"), so this will fail in the future
+  with_dict: "{{ downloads }}"
+
+- name: Check if iRODS has already been installed
+  stat:
+    path: "{{ config_irods_path }}"
+  register: irodspath_stat
+
+- name: Install iRODS
+  command: "cp -r {{ dl_dir }}/{{ downloads.irods.creates }} {{ config_irods_path }}"
+  when: irodspath_stat.stat.exists == False
+
+- name: Create required directories
+  file:
+    path: "{{ item.value.dest|dirname }}"
+    state: directory
+  with_dict: "{{ downloads }}"
+
+- name: Check if setAVU has already been installed
+  stat:
+    path: "{{ downloads.setavu.dest }}"
+  register: setavupath_stat
+
+- name: Install Cyverse setAVU module
+  command: "cp -r {{ dl_dir }}/{{ downloads.setavu.creates }} {{ downloads.setavu.dest }}"
+  when: setavupath_stat.stat.exists == False
+
+- name: Check if BMS has already been installed
+  stat:
+    path: "{{ downloads.bms.dest }}"
+  register: bmspath_stat
+
+- name: Install bms
+  command: "cp -r {{ dl_dir }}/{{ downloads.bms.creates }} {{ downloads.bms.dest }}"
+  when: bmspath_stat.stat.exists == False
+
+- name: Copy iRODS rules and command scripts
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - src: reConfigs/ipc-amqp.re.j2
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-amqp.re"
+      mode: "u=rw,g=r,o=r"
+    - src: reConfigs/ipc-custom.re.j2
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-custom.re"
+      mode: "u=rw,g=r,o=r"
+    - src: reConfigs/ipc-env.re.j2
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-env.re"
+      mode: "u=rw,g=r,o=r"
+    - src: reConfigs/ipc-json.re.j2
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-json.re"
+      mode: "u=rw,g=r,o=r"
+    - src: reConfigs/ipc-logic.re.j2
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-logic.re"
+      mode: "u=rw,g=r,o=r"
+    - src: reConfigs/ipc-uuid.re.j2
+      dest: "{{ config_irods_path }}/iRODS/server/config/reConfigs/ipc-uuid.re"
+      mode: "u=rw,g=r,o=r"
+    - src: reConfigs/server.config.in.j2
+      dest: "{{ config_irods_path }}/iRODS/server/config/server.config.in"
+      mode: "u=rw,g=r,o=r"
+    - src: commands/amqptopicsend.py.j2
+      dest: "{{ config_irods_path }}/iRODS/server/bin/cmd/amqptopicsend.py"
+      mode: "u=rwx,g=rw,o=rw"
+    - src: commands/generateuuid.sh.j2
+      dest: "{{ config_irods_path }}/iRODS/server/bin/cmd/generateuuid.sh"
+      mode: "u=rwx,g=rw,o=rw"
+    - src: setup.sql.j2
+      dest: "{{ config_irods_path }}/setup.sql"
+      mode: "u=rwx,g=rwx,o=rx"
+    - src: setup_postgres.sh.j2
+      dest: "{{ config_irods_path }}/setup_postgres.sh"
+      mode: "u=rwx,g=rwx,o=rx"
+    - src: setup_rabbitMQ.sh.j2
+      dest: "{{ config_irods_path }}/setup_rabbitMQ.sh"
+      mode: "u=rwx,g=rwx,o=rx"
+    - src: irods.config.j2
+      dest: "{{ config_irods_path }}/iRODS/config/irods.config"
+      mode: "u=rw,g=r,o=r"
+    - src: odbc.ini.j2
+      dest: "{{ config_irods_path }}/.odbc.ini"
+      mode: "u=rw,g=r,o=r"
+    - src: bms.config.j2
+      dest: "{{ config_irods_path }}/bms/bms.config"
+      mode: "u=rwx,g=rwx,o=rx"
+    - src: collection.c.j2
+      dest: "{{ config_irods_path }}/iRODS/server/core/src/"
+      mode: "u=rw,g=r,o=r"
+
+- name: Change iRODS path ownership
+  file:
+    dest: "{{ config_irods_path }}"
+    owner: "{{ config_irods_users_primary_username }}"
+    group: "{{ config_irods_users_primary_username }}"
+    recurse: yes
+
+- name: Configure Postgres DB for iRODS
+  command: "{{ config_irods_path }}/setup_postgres.sh"
+
+- name: Configure RabbitMQ for iRODS
+  command: "{{ config_irods_path }}/setup_rabbitMQ.sh"
+
+- name: Compile, setup and start iRODS service
+  shell: "yes | ./irodssetup"
+  become_user: "{{ config_irods_users_primary_username }}"
+  args:
+    chdir: "{{ config_irods_path }}/iRODS"
+  ignore_errors: true
+  register: irods_stat
+
+# The first attempt does not connect to the database...
+# try again, it should work this time
+- name: Retry start iRODS service
+  shell: "yes | ./irodssetup"
+  become_user: "{{ config_irods_users_primary_username }}"
+  args:
+    chdir: "{{ config_irods_path }}/iRODS"
+  when: irods_stat.failed == true
+
+- name: Set PATH for server commands
+  lineinfile: dest="/home/{{ config_irods_users_primary_username }}/.bashrc" line='export PATH=$PATH:{{ config_irods_path }}/iRODS/server/bin/cmd' insertafter='EOF' regexp='export PATH=$PATH:{{ config_irods_path }}/iRODS/server/bin/cmd' state=present
+
+- name: Set PATH for icommands
+  lineinfile: dest="/home/{{ config_irods_users_primary_username }}/.bashrc" line='export PATH=$PATH:{{ config_irods_path }}/iRODS/clients/icommands/bin' insertafter='EOF' regexp='export PATH=$PATH:{{ config_irods_path }}/iRODS/clients/icommands/bin' state=present
+
+- name: Start BMS
+  shell: "nohup {{ config_irods_path }}/bms/start.sh {{ config_irods_path }}/bms/bms.config &"

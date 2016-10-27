@@ -1,0 +1,22 @@
+[demo]
+docker-demo1 alias=ms
+docker-demo2 alias=irods
+
+[syndicate]
+docker-synclient1
+
+[syndicate-ms]
+docker-demo1
+
+[hadoop]
+docker-demo1
+docker-demo2
+
+[namenode]
+docker-demo1
+
+[irods]
+docker-demo2
+
+[demo-test]
+docker-synclient1

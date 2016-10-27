@@ -1,0 +1,66 @@
+---
+# irods/defaults/main.yml
+
+
+# iRODS configuration defaults
+
+config_amqp_host: 'localhost'
+config_amqp_port: 5672
+config_amqp_user: 'irods_ampq_user'
+config_amqp_password: 'irods_ampq_pass'
+
+config_database_name: iCAT
+config_database_hostname: localhost
+config_database_port: 5432
+
+config_irods_key_zone: TEMPORARY_zone_key
+config_irods_key_negotiation: TEMPORARY_32byte_negotiation_key
+config_irods_key_controlplane: TEMPORARY_32byte_ctrl_plane_key
+config_irods_path: "/var/lib/irods"
+config_irods_port_main: 1247
+config_irods_port_controlplane: 1248
+config_irods_port_filetxrangebegin: 20000
+config_irods_port_filetxrangeend: 20199
+config_irods_resourcename: demoResc
+config_irods_users_primary_username: irods_user
+config_irods_users_primary_password: ievieicefue9o
+config_irods_users_admin_username: irods_admin
+config_irods_users_admin_password: phia*sooNgu9
+config_irods_vaultdir: "{{ config_irods_path }}/iRODS/Vault"
+config_irods_validationbaseurl: "off"
+config_irods_zone: iplant
+
+# Download defaults
+dl_dir: /opt/downloads
+
+# Prerequisite packages
+prereq_packages:
+  - git
+  - postgresql-9.3
+  - python-pika
+  - python-psycopg2
+  - uuid-dev
+
+# Enable/start the following services
+prereq_enable_services:
+  - postgresql
+
+# installation downloads
+downloads:
+  irods: #software
+    - src: "ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu14/irods-icat-4.1.8-ubuntu14-x86_64.deb"   #src
+      cksum: "sha256:a33567e6563f7f9e024a38a43d7d208da5e053df10dc91eee310d4e057259ac6"                    #checksum
+      dest: "{{ dl_dir }}"                                                                                #path to download to
+      creates: "irods-icat-4.1.8-ubuntu14-x86_64.deb"                                                     #file or directory created
+    - src: "ftp://ftp.renci.org/pub/irods/releases/4.1.8/ubuntu14/irods-database-plugin-postgres-1.8-ubuntu14-x86_64.deb"
+      cksum: "sha256:70a00461dc77519ee1fb71d721e1798b19b21b7bfd1c2ce9d8aaada48bc56738"
+      dest: "{{ dl_dir }}"
+      creates: "irods-database-plugin-postgres-1.8-ubuntu14-x86_64.deb"
+
+irods_repos:
+  setavu:
+    src: "https://github.com/cyverse/irods-setavu-mod"
+    dest: "{{ config_irods_path }}/iRODS/modules/setavu"
+  cmd_scripts:
+    src: "https://github.com/cyverse/irods-cmd-scripts"
+    dest: ""

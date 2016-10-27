@@ -1,0 +1,69 @@
+---
+# irods3/defaults/main.yml
+
+
+# iRODS configuration defaults
+
+config_amqp_host: 'localhost'
+config_amqp_port: 5672
+config_amqp_user: 'irods_ampq_user'
+config_amqp_password: 'irods_ampq_pass'
+
+config_database_name: iCAT
+config_database_hostname: localhost
+config_database_port: 5432
+
+config_irods_key_zone: TEMPORARY_zone_key
+config_irods_key_negotiation: TEMPORARY_32byte_negotiation_key
+config_irods_key_controlplane: TEMPORARY_32byte_ctrl_plane_key
+config_irods_path: "/home/syndicate/irods"
+config_irods_port_main: 1247
+config_irods_port_controlplane: 1248
+config_irods_port_filetxrangebegin: 20000
+config_irods_port_filetxrangeend: 20199
+config_irods_resourcename: demoResc
+config_irods_users_primary_username: syndicate
+config_irods_users_primary_password: syndicate
+config_irods_users_admin_username: rods
+config_irods_users_admin_password: rods
+config_irods_vaultdir: "{{ config_irods_path }}/iRODS/Vault"
+config_irods_validationbaseurl: "off"
+config_irods_zone: iplant
+
+# Download defaults
+dl_dir: /opt/downloads
+
+prereq_packages:
+  - ant
+  - build-essential
+  - git
+  - odbc-postgresql
+  - openjdk-7-jdk
+  - postgresql-9.3
+  - python-pika
+  - python-psycopg2
+  - rabbitmq-server
+  - unixodbc-dev
+  - unzip
+  - uuid-dev
+  - uuid-runtime
+
+# Enable/start the following services
+prereq_enable_services:
+  - postgresql
+  - rabbitmq-server
+
+# installation downloads
+downloads:
+  irods:  #irods
+    src: 'https://github.com/irods/irods-legacy/archive/3.3.1.zip'  #<download from location/website>
+    creates: 'irods-legacy-3.3.1'                                   #<directory created after being uncompressed
+    dest: '{{ config_irods_path }}'                                        #<destination directory
+  setavu: #setavu
+    src: 'https://github.com/cyverse/irods-setavu-mod/archive/master.zip'
+    creates: 'irods-setavu-mod-master'
+    dest: '{{ config_irods_path }}/iRODS/modules/setavu'
+  bms:    #bms
+    src: 'https://github.com/iychoi/iPlantBorderMessageServer/archive/master.zip'
+    creates: 'iPlantBorderMessageServer-master'
+    dest: '{{ config_irods_path }}/bms'
