@@ -48,6 +48,14 @@
     - /opt/legacy-tests/results
     - /opt/legacy-tests/output
 
+- name: Create demo-tests softlink
+  file:
+    src: /opt/demo-tests
+    dest: /home/syndicate/demo-tests
+    owner: syndicate
+    group: syndicate
+    state: link
+
 - name: Get syndicate-ms certs
   copy:
     src: "/tmp/{{ item }}"

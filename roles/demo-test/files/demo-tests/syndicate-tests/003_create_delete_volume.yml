@@ -42,7 +42,7 @@
       command: mkdir -p $config_dir/volumes_bak
 
     - name: move aside volume data
-      command: mv $config_dir/volumes/* $config_dir/volumes_bak/
+      shell: mv $config_dir/volumes/* $config_dir/volumes_bak/
 
     - name: delete volume
       command: $SYNDICATE_TOOL -c "$syndicate_conf" delete_volume "$random_volume"
@@ -65,7 +65,7 @@
       exit: 1
 
     - name: move back volumes data
-      command: mv $config_dir/volumes_bak/* $config_dir/volumes/
+      shell: mv $config_dir/volumes_bak/* $config_dir/volumes/
 
     - name: delete on MS
       command: $SYNDICATE_TOOL -c "$syndicate_conf" delete_volume "$random_volume"
