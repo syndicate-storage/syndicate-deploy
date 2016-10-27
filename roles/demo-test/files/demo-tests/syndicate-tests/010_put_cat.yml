@@ -10,7 +10,7 @@
     - test_rg
     - put_ug
     - cat_ug
-  randloop:
+  randloop:              # list of random strings starting from 0
     - name: test_fnames
       quantity: 10
   vars:
@@ -26,23 +26,24 @@
       value: $SYNDICATE_UG_ROOT/syndicate-put
     - name: cat_path
       value: $SYNDICATE_UG_ROOT/syndicate-cat
+  debug: verbose
 
 - name: config
   type: sequential
   tasks:
-    - name: make local_file
+    - name: make random local_file
       command: $tasksf_dir/mkrandfile.py $local_file 16384
 
-    - name: setup
+    - name: setup security config
       command: $SYNDICATE_TOOL --trust_public_key -c "$syndicate_conf" --debug setup "$SYNDICATE_ADMIN" "$SYNDICATE_PRIVKEY_PATH" "$SYNDICATE_MS"
 
-    - name: add test volume
+    - name: add test volume config
       command: $SYNDICATE_TOOL -c "$syndicate_conf" create_volume name=$test_volume description="test volume" blocksize=4096 email=$SYNDICATE_ADMIN
 
-    - name: create RG
+    - name: create RG config
       command: $SYNDICATE_TOOL -c "$syndicate_conf" create_gateway name=$test_rg type=RG volume=$test_volume email=$SYNDICATE_ADMIN private_key=auto port=31111
 
-    - name: update RG
+    - name: update RG config
       command: $SYNDICATE_TOOL -c "$syndicate_conf" update_gateway name=$test_rg caps=ALL port=31112 driver=$rg_driver
 
 - name: daemon RG
@@ -55,16 +56,16 @@
 - name: setup UGs
   type: sequential
   tasks:
-    - name: create put UG
+    - name: create put UG config
       command: $SYNDICATE_TOOL -c "$syndicate_conf" create_gateway name=$put_ug type=UG volume=$test_volume email=$SYNDICATE_ADMIN private_key=auto port=31111
 
-    - name: update put UG
+    - name: update put UG config
       command: $SYNDICATE_TOOL -c "$syndicate_conf" update_gateway name=$put_ug caps=ALL
 
-    - name: create cat UG
+    - name: create cat UG config
       command: $SYNDICATE_TOOL -c "$syndicate_conf" create_gateway name=$cat_ug type=UG volume=$test_volume email=$SYNDICATE_ADMIN private_key=auto port=31111
 
-    - name: update cat UG
+    - name: update cat UG config
       command: $SYNDICATE_TOOL -c "$syndicate_conf" update_gateway name=$cat_ug caps=ALL
 
 - name: run put/cat tests
