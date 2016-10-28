@@ -15,7 +15,7 @@ config_database_port: 5432
 
 config_irods_key_zone: TEMPORARY_zone_key
 config_irods_key_negotiation: TEMPORARY_32byte_negotiation_key
-config_irods_key_controlplane: TEMPORARY_32byte_ctrl_plane_key
+config_irods_key_controlplane: TEMPORARY__32byte_ctrl_plane_key
 config_irods_path: "/var/lib/irods"
 config_irods_port_main: 1247
 config_irods_port_controlplane: 1248
@@ -57,10 +57,13 @@ downloads:
       dest: "{{ dl_dir }}"
       creates: "irods-database-plugin-postgres-1.8-ubuntu14-x86_64.deb"
 
-irods_repos:
+irods_git_repos:
   setavu:
     src: "https://github.com/cyverse/irods-setavu-mod"
     dest: "{{ config_irods_path }}/iRODS/modules/setavu"
   cmd_scripts:
     src: "https://github.com/cyverse/irods-cmd-scripts"
+    dest: ""
+  cmd_amqp_script:
+    src: "https://github.com/cyverse-ansible/ansible-cyverse-irods-cfg"
     dest: ""
