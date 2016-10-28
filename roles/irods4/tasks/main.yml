@@ -66,29 +66,29 @@
     repo: "{{ item.value.src }}"
     dest: "{{ dl_dir }}/{{ item.value.src | basename }}"
     version: master
-  with_dict: "{{ irods_repos }}"
+  with_dict: "{{ irods_git_repos }}"
 
 - name: Create required directories
   file:
     path: "{{ item.value.dest|dirname }}"
     state: directory
   when: item.value.dest != ""
-  with_dict: "{{ irods_repos }}"
+  with_dict: "{{ irods_git_repos }}"
 
 - name: Install repos
   command: "cp -r {{ dl_dir }}/{{ item.value.src | basename }} {{ item.value.dest }}"
   when: item.value.dest != ""
   args:
     creates: "{{ item.value.dest }}"
-  with_dict: "{{ irods_repos }}"
+  with_dict: "{{ irods_git_repos }}"
 
 - name: Install Cyverse command scripts
-  command: "cp -r {{ dl_dir }}/irods-cmd-scripts/{{ item }} {{ config_irods_path }}/iRODS/server/bin/cmd/{{ item }}"
+  command: "cp -r {{ item }} {{ config_irods_path }}/iRODS/server/bin/cmd/{{ item | basename }}"
   args:
-    creates: "{{ config_irods_path }}/iRODS/server/bin/cmd/{{ item }}"
+    creates: "{{ config_irods_path }}/iRODS/server/bin/cmd/{{ item | basename }}"
   with_items:
-    - "amqptopicsend.py"
-    - "generateuuid.sh"
+    - "{{ dl_dir }}/ansible-cyverse-irods-cfg/files/var/lib/irods/iRODS/server/bin/cmd/amqptopicsend.py"
+    - "{{ dl_dir }}/irods-cmd-scripts/generateuuid.sh"
 
 - name: Add iRODS database
   become_user: postgres
