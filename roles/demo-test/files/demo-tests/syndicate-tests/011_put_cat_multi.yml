@@ -35,7 +35,7 @@
   tasks:
     - name: make local_file1
       command: $tasksf_dir/mkrandfile.py $local_file1 16384
-    
+
     - name: make local_file2
       command: $tasksf_dir/mkrandfile.py $local_file2 16384
 

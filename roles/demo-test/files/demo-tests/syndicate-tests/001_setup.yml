@@ -9,7 +9,7 @@
 - name: setup_test
   type: sequential
   tasks:
-    - name: configure syndicate 
+    - name: configure syndicate
       command: $SYNDICATE_TOOL --trust_public_key -c "${config_dir}/syndicate.conf" --debug setup "$SYNDICATE_ADMIN" "$SYNDICATE_PRIVKEY_PATH" "$SYNDICATE_MS"
 
     - name: test for syndicate.conf

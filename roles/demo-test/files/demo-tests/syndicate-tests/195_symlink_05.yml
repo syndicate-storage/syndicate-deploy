@@ -139,4 +139,4 @@
     - name: T6 - expect 0 rmdir [n0]
       command: fstest rmdir ${n0}
       compareout: "0"
-      
+
