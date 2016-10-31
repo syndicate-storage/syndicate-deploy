@@ -1,8 +1,8 @@
 ---
-# syndicate/tasks/main.yml
-# Installs syndicate packages
+# syndicate-ms/tasks/main.yml
+# Installs syndicate MS
 
-- name: Prereqs and SSL support for apt for SSL
+- name: SSL support for apt
   become: yes
   apt:
     name: "{{ item }}"
@@ -10,38 +10,20 @@
     cache_valid_time: 3600
     state: installed
   with_items:
-    - "{{ syndicatems_prereq_packages }}"
+    - apt-transport-https
+    - ca-certificates
 
-- name: Create syndicate user
-  user:
-    name: "{{ syndicate_user }}"
-    password: "{{ syndicate_password | password_hash('sha512') }}"
-
-- name: Make dl_dir
-  file:
-    path: "{{ dl_dir }}"
-    state: directory
-
-- name: Get the google app engine
-  get_url:
-    url: "{{ GAE_SDK }}"
-    dest: "{{ dl_dir }}/{{ GAE_SDK | basename }}"
-
-- name: Install GAE
-  unarchive:
-    src: "{{ dl_dir }}/{{ GAE_SDK | basename }}"
-    dest: "/home/{{ syndicate_user }}"
-  ignore_errors: true
-  register: gae_install_status
-
-- name: Check if GAE install failed due to the unarchive bug
-  stat:
-    path: "{{ gae_path }}"
-  register: gae_path_status
-
-- name: Install GAE, try again
-  shell: "cd /home/{{ syndicate_user }} && unzip {{ dl_dir }}/{{ GAE_SDK | basename }}"
-  when: gae_install_status.failed == true and ( gae_path_status.stat.isdir is not defined or gae_path_status.stat.isdir == false )
+- name: Utilities
+  become: yes
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: installed
+  with_items:
+    - unzip
+    - make
+    - daemon
 
 - name: Trust butler opencloud apt repo
   apt_key:
@@ -64,12 +46,44 @@
     filename: "butler"
     state: present
 
+- name: Create syndicate user
+  user:
+    name: "{{ syndicate_user }}"
+    password: "{{ syndicate_password | password_hash('sha512') }}"
+
+- name: Make dl_dir
+  file:
+    path: "{{ dl_dir }}"
+    state: directory
+
+- name: Get the google app engine
+  get_url:
+    url: "{{ gae_sdk }}"
+    checksum: {{ gae_sdk_checksum }}
+    dest: "{{ dl_dir }}/{{ gae_sdk | basename }}"
+
+- name: Install GAE
+  unarchive:
+    src: "{{ dl_dir }}/{{ gae_sdk | basename }}"
+    dest: "{{ gae_path | dirname }}"
+  ignore_errors: true
+  register: gae_install_status
+
+- name: Check if GAE install failed due to the unarchive bug
+  stat:
+    path: "{{ gae_path }}"
+  register: gae_path_status
+
+- name: Install GAE, try again
+  shell: "cd {{ gae_path | dirname }} && unzip {{ dl_dir }}/{{ GAE_SDK | basename }}"
+  when: gae_install_status.failed == true and ( gae_path_status.stat.isdir is not defined or gae_path_status.stat.isdir == false )
+
 - name: Install syndicate-ms packages
   apt:
     name: "{{ item }}"
     update_cache: yes
     cache_valid_time: 3600
-    state: present
+    state: latest
   with_items:
     - syndicate-ms
 
@@ -88,6 +102,8 @@
   args:
     chdir: "{{ ms_path }}"
     creates: "{{ ms_path }}/app.yaml"
+  notify:
+    - restart-syndicate-ms
 
 - name: Adjust syndicate directory ownerships
   file:
@@ -100,33 +116,32 @@
   with_items:
     - "/home/{{ syndicate_user }}"
     - "{{ ms_path }}"
+    - "{{ ms_pid_dir }}"
+    - "{{ ms_data_path }}"
 
-- name: Fetch syndicate certs for demo-test
-  fetch:
-    src: "{{ ms_path }}/{{ item }}"
-    dest: "/tmp/"
-    flat: yes
+- name: Template /etc/profile.d config files
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/profile.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
   with_items:
-    - admin.pub
-    - admin.pem
-    - syndicate.pub
-    - syndicate.pem
-  when: inventory_hostname in groups['syndicate-ms']
+    - gae.sh
 
-- name: Link syndicate certs
-  file:
-    src: "/opt/ms_certs/{{ item }}"
-    dest: "{{ ms_path }}/{{ item }}"
-    state: link
-    force: yes
+- name: Copy over initscripts
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/init.d/{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "0755"
   with_items:
-    - admin.pub
-    - admin.pem
-    - syndicate.pub
-    - syndicate.pem
-  when: inventory_hostname not in groups['syndicate-ms']
+    - syndicate-ms
 
-- name: Start syndicate-ms
-  become_user: "{{ syndicate_user }}"
-  command: "daemon -- {{ gae_path }}/{{ gae_cmd }}"
-  when: inventory_hostname in groups['syndicate-ms']
+- name: Start syndicate processes
+  service:
+    name: "{{ item }}"
+    state: started
+  with_items:
+    - syndicate-ms

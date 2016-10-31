@@ -1,0 +1,9 @@
+---
+# syndicate-ms/handlers/main.yml
+
+- name: restart-syndicate-ms
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - syndicate-ms

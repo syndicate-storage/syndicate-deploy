@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#
+# Starts a Syndicate MS
+#
+# chkconfig: 2345 80 10
+# description: Syndicate MS
+
+source /lib/lsb/init-functions
+
+RETVAL=0
+SYNDICATE_PID_DIR="{{ ms_pid_dir }}"
+GAE_PATH="{{ gae_path }}"
+GAE_ADMIN_HOST="{{ gae_admin_host }}"
+GAE_ADMIN_PORT={{ gae_admin_port }}
+GAE_SERVICE_HOST="{{ gae_service_host }}"
+GAE_SERVICE_PORT={{ gae_service_port }}
+MS_DATA_DIR="{{ ms_data_path }}"
+MS_SRC_DIR="{{ ms_path }}"
+
+PIDFILE="${SYNDICATE_PID_DIR}/syndicate-ms.pid"
+PNAME="syndicate-ms"
+desc="Syndicate MS daemon"
+
+start() {
+  if daemon --running --name ${PNAME} --pidfiles ${PIDFILE}
+  then
+      echo "$desc is already running."
+      return 0
+  else
+      echo -n $"Starting $desc: "
+      daemon --name ${PNAME} --pidfiles ${PIDFILE} ${GAE_PATH}/dev_appserver.py --admin_host=${GAE_ADMIN_HOST} --admin_port=${GAE_ADMIN_PORT} --host=${GAE_SERVICE_HOST} --port=${GAE_SERVICE_PORT} --storage_path=${MS_DATA_DIR} --skip_sdk_update_check=true ${MS_SRC_DIR}
+      RETVAL=$?
+      echo
+      [ $RETVAL -eq 0 ] && touch /var/lock/syndicate-ms
+      return $RETVAL
+  fi
+}
+
+stop() {
+  if daemon --running --name ${PNAME} --pidfiles ${PIDFILE}
+  then
+      echo -n $"Stopping $desc: "
+      daemon --stop --name ${PNAME} --pidfiles ${PIDFILE}
+      RETVAL=$?
+      sleep 5
+      echo
+      [ $RETVAL -eq 0 ] && rm -f /var/lock/syndicate-ms $PIDFILE
+  else
+    echo "$desc is not running."
+    return 0
+  fi
+}
+
+restart() {
+  stop
+  start
+}
+
+checkstatus(){
+  echo $"$desc $(status -p $PIDFILE)"
+  RETVAL=$?
+}
+
+condrestart(){
+  [ -e /var/lock/syndicate-ms ] && restart || :
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  status)
+    checkstatus
+    ;;
+  restart)
+    restart
+    ;;
+  condrestart)
+    condrestart
+    ;;
+  *)
+    echo $"Usage: $0 {start|stop|status|restart|condrestart}"
+    exit 1
+esac
+
+exit $RETVAL

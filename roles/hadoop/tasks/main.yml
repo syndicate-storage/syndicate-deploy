@@ -160,4 +160,3 @@
   with_items:
     - hadoop-datanode
     - hadoop-nodemanager
-
