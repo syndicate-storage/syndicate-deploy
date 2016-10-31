@@ -2,23 +2,34 @@
 # roles/ufw/tasks/main.yml
 
 - name: Allow SSH through firewall
-  ufw: rule=allow port=22 proto=tcp
+  ufw:
+    rule: allow
+    port: 22
+    proto: tcp
 
 - name: Allow tcp ports
   when: "{{ allowed_tcp_ports | length > 0 }}"
-  ufw: rule=allow port={{ item }} proto=tcp
+  ufw:
+    rule: allow
+    port: {{ item }}
+    proto: tcp
   with_items: "{{ allowed_tcp_ports }}"
 
 - name: Allow udp ports
   when: "{{ allowed_udp_ports | length > 0 }}"
-  ufw: rule=allow port={{ item }} proto=udp
+  ufw:
+    rule: allow
+    port: {{ item }}
+    proto: udp
   with_items: "{{ allowed_udp_ports }}"
 
 - name: Allow local network TCP ports
   when: "{{ hostvars[ansible_fqdn]['ansible_'~item[1]]['ipv4']['network'] is defined }}"
   ufw:
-    rule=allow port={{ item[0] }} proto=tcp
-    src="{{ hostvars[ansible_fqdn]['ansible_'~item[1]]['ipv4']['network'] }}/{{ hostvars[ansible_fqdn]['ansible_'~item[1]]['ipv4']['netmask'] }}"
+    rule: allow
+    port: {{ item[0] }}
+    proto: tcp
+    src: "{{ hostvars[ansible_fqdn]['ansible_'~item[1]]['ipv4']['network'] }}/{{ hostvars[ansible_fqdn]['ansible_'~item[1]]['ipv4']['netmask'] }}"
   with_nested:
     - "{{ allowed_local_tcp_ports }}"
     - "{{ ansible_interfaces | map('replace','-','_') | list }}"
@@ -26,15 +37,17 @@
 - name: Allow other ranges access to TCP ports
   when: "{{ allowed_ip_ranges | length > 0 }}"
   ufw:
-    rule=allow port={{ item[0] }} proto=tcp
-    src="{{ item[1] }}"
+    rule: allow
+    port: {{ item[0] }}
+    proto: tcp
+    src: "{{ item[1] }}"
   with_nested:
     - "{{ allowed_local_tcp_ports }}"
     - "{{ allowed_ip_ranges }}"
 
 - name: Reject everything else
   ufw:
-    state=enabled
-    logging=low
-    policy=reject
+    state: enabled
+    logging: low
+    policy: reject
 

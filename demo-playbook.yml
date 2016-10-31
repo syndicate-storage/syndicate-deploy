@@ -27,7 +27,7 @@
   become: yes
   roles:
     - hadoop
-    - demo-install
+    - demo-app
 
 - name: Install Syndicate MS
   hosts: syndicate-ms
