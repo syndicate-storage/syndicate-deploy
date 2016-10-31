@@ -10,22 +10,30 @@
   when: ansible_os_family == 'Debian'
 
 - name: create base sites dir
-  file: path={{ apache_sites_dir }} state=directory
-        owner=root group=root mode=0755
+  file:
+    path: {{ apache_sites_dir }}
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
 
 - name: Create ssl certificate directory
   when: apache_ssl_enabled
   file:
-    state=directory
-    dest={{ apache_ssl_cert_dir }}
-    owner=root group=ssl-cert mode=0750
+    state: directory
+    dest: {{ apache_ssl_cert_dir }}
+    owner: root
+    group: ssl-cert
+    mode: 0750
 
 - name: copy over SSL certificates if ssl is enabled
   when: apache_ssl_enabled
   copy:
-    src="{{ apache_ssl_cert_name }}{{ item }}"
-    dest="{{ apache_ssl_cert_dir }}/{{ apache_ssl_cert_name }}{{ item }}"
-    owner=root group=ssl-cert mode=0640
+    src: "{{ apache_ssl_cert_name }}{{ item }}"
+    dest: "{{ apache_ssl_cert_dir }}/{{ apache_ssl_cert_name }}{{ item }}"
+    owner: root
+    group: ssl-cert
+    mode: 0640
   with_items:
     - ".key"
     - ".cer"
@@ -33,14 +41,16 @@
 
 - name: enable apache_modules
   when: ansible_os_family == "Debian"
-  command: a2enmod {{ item }} creates=/etc/apache2/mods-enabled/{{ item }}.load
+  command: a2enmod {{ item }}
+    creates: /etc/apache2/mods-enabled/{{ item }}.load
   with_items: "{{ apache_modules }}"
   notify:
     - apache-restart
 
 - name: enable apache service
   when: ansible_os_family == "Debian"
-  service: name={{ item }} state=started
+  service:
+    name: "{{ item }}"
+    state: started
   with_items:
     - apache2
-
