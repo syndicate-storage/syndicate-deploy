@@ -3,31 +3,35 @@
 
 - name: Create apache2 site config file for Jenkins
   template:
-    src=jenkins.conf.j2
-    dest=/etc/apache2/sites-available/jenkins.conf
-    mode=0644 owner=root group=root
+    src: "jenkins.conf.j2"
+    dest: "/etc/apache2/sites-available/jenkins.conf"
+    mode: 0644
+    owner: root
+    group: root
   notify:
     - apache-restart
 
 - name: Make sure passlib is installed
   when: jenkins_apache_basicauth
   apt:
-    name=python-passlib
-    cache_valid_time=3600
-    state=installed
+    name: "python-passlib"
+    cache_valid_time: 3600
+    state: installed
 
 - name: Create jenkins htpasswd file
   when: jenkins_apache_basicauth
   htpasswd:
-    path={{ jenkins_apache_basicauth_path }}
-    name={{ item.user }}
-    password={{ item.pass }}
-    mode=0644 owner=root group=root
+    path: "{{ jenkins_apache_basicauth_path }}"
+    name: "{{ item.user }}"
+    password: "{{ item.pass }}"
+    mode: 0644
+    owner: root
+    group: root
   with_items: "{{ jenkins_apache_basicauth_users }}"
 
 - name: Enable site
   command: a2ensite jenkins.conf
-           creates=/etc/apache2/sites-enabled/jenkins.conf
+    creates=/etc/apache2/sites-enabled/jenkins.conf
   notify:
     - apache-restart
 

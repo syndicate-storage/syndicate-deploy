@@ -3,24 +3,24 @@
 
 - name: sshd should not allow remote root login
   lineinfile:
-    dest=/etc/ssh/sshd_config
-    regexp="^PermitRootLogin"
-    line="PermitRootLogin no"
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
   notify:
     - restart-sshd
 
 - name: sshd should only allow users with keys - disable password auth
   lineinfile:
-    dest=/etc/ssh/sshd_config
-    insertafter="^#PasswordAuthentication"
-    line="PasswordAuthentication no"
+    dest: /etc/ssh/sshd_config
+    insertafter: "^#PasswordAuthentication"
+    line: "PasswordAuthentication no"
   notify:
     - restart-sshd
 
 - name: sshd should only allow users with keys - disable challenge/response auth
   lineinfile:
-    dest=/etc/ssh/sshd_config
-    insertafter="^#ChallengeResponseAuthentication"
-    line="ChallengeResponseAuthentication no"
+    dest: "/etc/ssh/sshd_config"
+    insertafter: "^#ChallengeResponseAuthentication"
+    line: "ChallengeResponseAuthentication no"
   notify:
     - restart-sshd

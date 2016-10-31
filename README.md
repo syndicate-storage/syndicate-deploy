@@ -46,3 +46,6 @@ etc.) are not included.
 
 Installs Hadoop on a system, with H-Syndicate.
 
+## `syndicate-ms-playbook.yml`
+
+Installs Syndicate MetadataService (MS) on a system.

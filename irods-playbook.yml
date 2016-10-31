@@ -13,5 +13,6 @@
   roles:
     - common-prep
     - ssh-lockdown
+    - ufw
     - { role: irods3, when: irods_version == 3 }
     - { role: irods4, when: irods_version == 4 }

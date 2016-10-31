@@ -3,9 +3,9 @@
 
 - name: Upgrade system to current using apt
   apt:
-    upgrade=dist
-    update_cache=yes
-    cache_valid_time=3600
+    upgrade: dist
+    update_cache: yes
+    cache_valid_time: 3600
 
 - name: Register if a reboot is required
   stat:
@@ -14,46 +14,48 @@
 
 - name: Reboot if required
   when: reboot-required.exists is defined
-  debug: msg="System will reboot"
+  debug:
+    msg: "System will reboot"
   notify:
     - restart host
     - wait for host
 
 - name: Install standard packages
   apt:
-    pkg={{ item }}
-    state=present
-    update_cache=yes
-    cache_valid_time=3600
+    pkg: "{{ item }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
   with_items:
    - tmux
    - vim
 
 - name: Remove annoying default editors
   apt:
-    pkg={{ item }}
-    state=absent
-    update_cache=yes
-    cache_valid_time=3600
+    pkg: "{{ item }}"
+    state: absent
+    update_cache: yes
+    cache_valid_time: 3600
   with_items:
    - nano
    - jove
 
 - name: Enable vim syntax highlighting
-  lineinfile: dest=/etc/vim/vimrc
-    regexp="^\s*syntax on"
-    line="syntax on"
+  lineinfile:
+    dest: /etc/vim/vimrc
+    regexp: "^\s*syntax on"
+    line: "syntax on"
 
 - name: Configure tmux
   copy:
-    src=tmux.conf
-    dest="{{ ansible_user_dir }}/.tmux.conf"
+    src: tmux.conf
+    dest: "{{ ansible_user_dir }}/.tmux.conf"
 
 - name: Copy /etc/hosts
   copy:
     src: /etc/hosts
     dest: /tmp/hosts
-    remote_src: true
+    remote_src: true 
 
 - name: Populate hosts from inventory
   lineinfile: dest=/tmp/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{item}}" state=present

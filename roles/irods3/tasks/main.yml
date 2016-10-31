@@ -8,10 +8,10 @@
 
 - name: Install prerequisites
   apt:
-    name={{ item }}
-    update_cache=yes
-    cache_valid_time=3600
-    state=installed
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: installed
   with_items: "{{ prereq_packages }}"
 
 - name: Create iRODS users
