@@ -8,7 +8,7 @@
 - name: Add hadoop users
   user:
     name: "{{ item }}"
-    group: "hadoop"
+    group: hadoop
     comment: "Hadoop {{ item }}"
     home: "{{ hadoop_home }}"
   with_items:
@@ -25,10 +25,10 @@
 
 - name: Install software with apt
   apt:
-    name={{ item }}
-    update_cache=yes
-    cache_valid_time=3600
-    state=installed
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: installed
   with_items: "{{ hadoop_apt_packages }}"
 
 - name: Make dl_dir
@@ -56,7 +56,7 @@
   args:
     creates: "{{ hadoop_home }}/share"
   tags:
-  - skip_ansible_lint #skip lint error due to strip-components bug
+    - skip_ansible_lint #skip lint error due to strip-components bug
 
 - name: Make Hadoop subdirs
   file:

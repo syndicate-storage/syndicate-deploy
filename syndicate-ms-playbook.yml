@@ -1,0 +1,10 @@
+---
+# Install syndicate MS
+
+- hosts: syndicate-ms
+  become: yes
+  roles:
+    - common-prep
+    - ssh-lockdown
+    - ufw
+    - syndicate-ms
