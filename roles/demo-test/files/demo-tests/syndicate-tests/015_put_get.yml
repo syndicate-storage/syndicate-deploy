@@ -3,7 +3,7 @@
 - name: setup_put_get
   type: setup
   tmpdirs:
-    - name: 011_put_get
+    - name: 015_put_get
       varname: config_dir
   randnames:
     - test_volume

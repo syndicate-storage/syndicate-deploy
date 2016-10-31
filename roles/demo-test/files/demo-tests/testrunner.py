@@ -4,6 +4,7 @@
 
 import argparse
 import collections
+import copy
 import datetime
 import itertools
 import logging
@@ -202,10 +203,7 @@ def replace_vars(string):
     rsv_matches = rsv.findall(string)
 
     for match in rsv_matches:
-        if match in r_vars: #see if captured matches are defined as a replacement variable
-            rr = re.compile('\$%s' % match)
-            string = rr.sub(r_vars[match], string, count=1)
-        elif ('%s[' % match) in string: #check for explicit array use
+        if ('%s[' % match) in string: #check for explicit array use
             riv = re.compile('%s\[\$?(\S+)\]' % match)
             idxvar = riv.findall(string)
             if not idxvar:
@@ -217,6 +215,9 @@ def replace_vars(string):
                 idx = int(r_vars[idxvar[0]]) 
             rr = re.compile('\$\{?%s\[\$?\S+\]\}?' % match)              #capture the array string refernce
             string = rr.sub(str(loop_vars[match][idx]), string, count=1) #and replace with the array's value
+        elif match in r_vars: #see if captured matches are defined as a replacement variable
+            rr = re.compile('\$%s' % match)
+            string = rr.sub(r_vars[match], string, count=1)
         else:
             logger.error("Unknown variable: '$%s' in '%s'" %
                          (match, string))
@@ -226,10 +227,7 @@ def replace_vars(string):
     rcv_matches = rcv.findall(string)
 
     for match in rcv_matches:
-        if match in r_vars:
-            rr = re.compile('\$\{%s\}' % match)
-            string = rr.sub(r_vars[match], string, count=1)
-        elif ('%s[' % match) in string: #check for explicit array use
+        if ('%s[' % match) in string: #check for explicit array use
             riv = re.compile('%s\[\$?(\S+)\]' % match)
             idxvar = riv.findall(string)
             if not idxvar:
@@ -241,6 +239,9 @@ def replace_vars(string):
                 idx = int(r_vars[idxvar[0]]) 
             rr = re.compile('\$\{?%s\[\$?\S+\]\}?' % match)              #capture the array string refernce
             string = rr.sub(str(loop_vars[match][idx]), string, count=1) #and replace with the array's value
+        elif match in r_vars:
+            rr = re.compile('\$\{%s\}' % match)
+            string = rr.sub(r_vars[match], string, count=1)
         else:
             logger.error("Unknown variable: '$%s' in '%s'" %
                          (match, string))
@@ -581,27 +582,6 @@ class CommandRunner():
                              (self.task['name'], stdout_str.rstrip(), cout_rv))
                 logger.error(cout_fail)
                 failures.append(cout_fail)
-        
-        if 'containsout' in self.task:
-            strlist = []
-            if type(self.task['containsout']) is list:
-                strlist = self.task['containsout']
-            else:
-                strlist.append(str(self.task['containsout']))
-
-            for pattern in strlist:
-                rpattern = replace_vars(pattern)
-                if rpattern in stdout_str.rstrip():
-                    logger.debug("Task '%s' stdout contains string of '%s'" %
-                                 (self.task['name'], pattern))
-                else:
-                    containsout_fail = ("Task '%s' stdout does not contain string of '%s'" %
-                                     (self.task['name'], pattern))
-                    logger.error(containsout_fail)
-                    failures.append(containsout_fail)
-            if 'verbose' in debugoptions: 
-                logger.debug("Task '%s' stdout was: '%s'" %
-                            (self.task['name'], stdout_str))
 
         if 'compareerr' in self.task:
             cerr_rv = replace_vars(str(self.task['compareerr']))
@@ -614,6 +594,48 @@ class CommandRunner():
                              (self.task['name'], stderr_str.rstrip(), cerr_rv))
                 logger.error(cerr_fail)
                 failures.append(cerr_fail)
+        
+        if 'containsout' in self.task:
+            strlist = []
+            if type(self.task['containsout']) is list:
+                strlist = self.task['containsout']
+            else:
+                strlist.append(str(self.task['containsout']))
+
+            for pattern in strlist:
+                rpattern = replace_vars(str(pattern))
+                if rpattern in stdout_str.rstrip():
+                    logger.debug("Task '%s' stdout contains string of '%s'" %
+                                 (self.task['name'], rpattern))
+                else:
+                    containsout_fail = ("Task '%s' stdout does not contain string of '%s'" %
+                                     (self.task['name'], rpattern))
+                    logger.error(containsout_fail)
+                    failures.append(containsout_fail)
+            if 'verbose' in debugoptions: 
+                logger.debug("Task '%s' stdout was: '%s'" %
+                            (self.task['name'], stdout_str))
+        
+        if 'containserr' in self.task:
+            strlist = []
+            if type(self.task['containserr']) is list:
+                strlist = self.task['containserr']
+            else:
+                strlist.append(str(self.task['containserr']))
+
+            for pattern in strlist:
+                rpattern = replace_vars(str(pattern))
+                if rpattern in stderr_str.rstrip():
+                    logger.debug("Task '%s' stderr contains string of '%s'" %
+                                 (self.task['name'], pattern))
+                else:
+                    containserr_fail = ("Task '%s' stderr does not contain string of '%s'" %
+                                     (self.task['name'], pattern))
+                    logger.error(containserr_fail)
+                    failures.append(containserr_fail)
+            if 'verbose' in debugoptions: 
+                logger.debug("Task '%s' stderr was: '%s'" %
+                            (self.task['name'], stderr_str))
 
         if tap_writer:
 
@@ -695,9 +717,14 @@ class RunParallel():
                             r_vars['nested_loop_var'] = str(nested_loop_var) #instead of "loop_var" use "nested_loop_var"
                         index+=1 
                         r_vars['loop_index'] = str(index)
-                        modified_task = task.copy()
-                        for subtask in task:
-                            modified_task[subtask] = replace_vars(task[subtask])
+                        modified_task = copy.deepcopy(task)
+                        for subtask in task:                          #replace_vars on all lines per task
+                            if type(task[subtask]) is list:           #also per str within lists
+                                for itemnum in range(len(task[subtask])):
+                                    if type(task[subtask][itemnum]) is str:
+                                        modified_task[subtask][itemnum] = replace_vars(task[subtask][itemnum])
+                            elif type(task[subtask]) is str:
+                                modified_task[subtask] = replace_vars(task[subtask])
 
                         for key in ['name', 'saveout', 'saveerr', ]:
                             if key in task:
@@ -706,9 +733,14 @@ class RunParallel():
                 else:
                     index+=1
                     r_vars['loop_index'] = str(index)
-                    modified_task = task.copy()
-                    for subtask in task:
-                        modified_task[subtask] = replace_vars(task[subtask])
+                    modified_task = copy.deepcopy(task)
+                    for subtask in task:                              #replace_vars on all lines per task
+                        if type(task[subtask]) is list:               #also per str within lists
+                            for itemnum in range(len(task[subtask])):
+                                if type(task[subtask][itemnum]) is str:
+                                    modified_task[subtask][itemnum] = replace_vars(task[subtask][itemnum])
+                        elif type(task[subtask]) is str:
+                            modified_task[subtask] = replace_vars(task[subtask])
 
                     for key in ['name', 'saveout', 'saveerr', ]:
                         if key in task:

@@ -3,7 +3,7 @@
 - name: setup_put_getxattr
   type: setup
   tmpdirs:
-    - name: 014_put_getxattr_builtin
+    - name: 016_put_getxattr_builtin
       varname: config_dir
   randnames:
     - test_volume

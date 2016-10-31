@@ -28,8 +28,8 @@
       command: test -d "${config_dir}/syndicate"
 
     - name: test for admin cert
-      command: test -f "${config_dir}/users/$SYNDICATE_ADMIN.cert"
+      command: test -f "${config_dir}/users/${SYNDICATE_ADMIN}.cert"
 
     - name: test for admin pkey
-      command: test -f "${config_dir}/users/$SYNDICATE_ADMIN.pkey"
+      command: test -f "${config_dir}/users/${SYNDICATE_ADMIN}.pkey"
 
