@@ -15,7 +15,7 @@ config_database_port: 5432
 
 config_irods_key_zone: TEMPORARY_zone_key
 config_irods_key_negotiation: TEMPORARY_32byte_negotiation_key
-config_irods_key_controlplane: TEMPORARY_32byte_ctrl_plane_key
+config_irods_key_controlplane: TEMPORARY__32byte_ctrl_plane_key
 config_irods_path: "/var/lib/irods"
 config_irods_port_main: 1247
 config_irods_port_controlplane: 1248
