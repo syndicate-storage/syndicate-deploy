@@ -2,4 +2,6 @@
 
 allowed_tcp_ports:
   - 8000 # for ms service
+
+allowed_local_tcp_ports:
   - 8001 # for ms admin
