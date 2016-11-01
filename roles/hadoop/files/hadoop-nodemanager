@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 
+#
 # Starts a Hadoop YARN NodeManager
-# 
+#
 # chkconfig: 2345 80 10
 # description: Hadoop YARN NodeManager
 
@@ -33,7 +33,7 @@ desc="Hadoop YARN NodeManager daemon"
 
 start() {
   echo -n $"Starting $desc (hadoop-nodemanager): "
-  daemon --user yarn ${HADOOP_HOME}/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" start nodemanager
+  daemon --user yarn -- ${HADOOP_HOME}/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" start nodemanager
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && touch /var/lock/hadoop-yarn-nodemanager
@@ -42,7 +42,7 @@ start() {
 
 stop() {
   echo -n $"Stopping $desc (hadoop-nodemanager): "
-  daemon --user yarn ${HADOOP_HOME}/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" stop nodemanager
+  daemon --user yarn -- ${HADOOP_HOME}/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" stop nodemanager
   RETVAL=$?
   sleep 5
   echo

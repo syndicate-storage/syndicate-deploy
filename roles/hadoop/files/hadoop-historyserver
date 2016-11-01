@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 
+#
 # Starts a Hadoop MapReduce History Server
-# 
+#
 # chkconfig: 2345 85 10
 # description: Hadoop MapReduce History Server
 
@@ -32,7 +32,7 @@ desc="Hadoop MapReduce History Server daemon"
 
 start() {
   echo -n $"Starting $desc (hadoop-historyserver): "
-  daemon --user mapred ${HADOOP_HOME}/sbin/mr-jobhistory-daemon.sh --config "${HADOOP_CONF_DIR}" start historyserver
+  daemon --user mapred -- ${HADOOP_HOME}/sbin/mr-jobhistory-daemon.sh --config "${HADOOP_CONF_DIR}" start historyserver
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && touch /var/lock/hadoop-historyserver
@@ -41,7 +41,7 @@ start() {
 
 stop() {
   echo -n $"Stopping $desc (hadoop-historyserver): "
-  daemon --user mapred ${HADOOP_HOME}/sbin/mr-jobhistory-daemon.sh --config "${HADOOP_CONF_DIR}" stop historyserver
+  daemon --user mapred -- ${HADOOP_HOME}/sbin/mr-jobhistory-daemon.sh --config "${HADOOP_CONF_DIR}" stop historyserver
   RETVAL=$?
   sleep 5
   echo

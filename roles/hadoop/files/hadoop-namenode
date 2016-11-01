@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 
+#
 # Starts a Hadoop HDFS NameNode
-# 
+#
 # chkconfig: 2345 80 10
 # description: Hadoop HDFS NameNode
 
@@ -32,7 +32,7 @@ desc="Hadoop HDFS NameNode daemon"
 
 start() {
   echo -n $"Starting $desc (hadoop-namenode): "
-  daemon --user hdfs ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" start namenode
+  daemon --user hdfs -- ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" start namenode
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && touch /var/lock/hadoop-namenode
@@ -45,7 +45,7 @@ upgrade() {
 
 stop() {
   echo -n $"Stopping $desc (hadoop-namenode): "
-  daemon --user hdfs ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" stop namenode
+  daemon --user hdfs -- ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" stop namenode
   RETVAL=$?
   sleep 5
   echo
@@ -67,7 +67,7 @@ condrestart(){
 }
 
 format() {
-  daemon --user hdfs ${HADOOP_HOME}/bin/hdfs namenode -format
+  daemon --user hdfs -- ${HADOOP_HOME}/bin/hdfs namenode -format
 }
 
 case "$1" in
