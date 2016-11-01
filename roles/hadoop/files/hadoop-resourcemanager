@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 
+#
 # Starts a Hadoop YARN ResourceManager
-# 
+#
 # chkconfig: 2345 80 10
 # description: Hadoop YARN ResourceManager
 
@@ -33,7 +33,7 @@ desc="Hadoop YARN ResourceManager daemon"
 
 start() {
   echo -n $"Starting $desc (hadoop-yarn-resourcemanager): "
-  daemon --user yarn ${HADOOP_HOME}/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" start resourcemanager
+  daemon --user yarn -- ${HADOOP_HOME}/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" start resourcemanager
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && touch /var/lock/hadoop-yarn-resourcemanager
@@ -42,7 +42,7 @@ start() {
 
 stop() {
   echo -n $"Stopping $desc (hadoop-yarn-resourcemanager): "
-  daemon --user yarn ${HADOOP_HOME}/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" stop resourcemanager
+  daemon --user yarn -- ${HADOOP_HOME}/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" stop resourcemanager
   RETVAL=$?
   sleep 5
   echo
