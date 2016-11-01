@@ -9,7 +9,7 @@
 
 - name: Register if a reboot is required
   stat:
-    path=/var/run/reboot-required
+    path: /var/run/reboot-required
   register: reboot-required
 
 - name: Reboot if required
@@ -41,10 +41,7 @@
    - jove
 
 - name: Enable vim syntax highlighting
-  lineinfile:
-    dest: /etc/vim/vimrc
-    regexp: "^\s*syntax on"
-    line: "syntax on"
+  lineinfile: dest=/etc/vim/vimrc regexp="^\s*syntax on" line="syntax on"
 
 - name: Configure tmux
   copy:
@@ -55,7 +52,7 @@
   copy:
     src: /etc/hosts
     dest: /tmp/hosts
-    remote_src: true 
+    remote_src: true
 
 - name: Populate hosts from inventory
   lineinfile: dest=/tmp/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{item}}" state=present

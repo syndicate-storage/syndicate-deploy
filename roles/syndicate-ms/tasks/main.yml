@@ -59,7 +59,7 @@
 - name: Get the google app engine
   get_url:
     url: "{{ gae_sdk }}"
-    checksum: {{ gae_sdk_checksum }}
+    checksum: "{{ gae_sdk_checksum }}"
     dest: "{{ dl_dir }}/{{ gae_sdk | basename }}"
 
 - name: Install GAE
