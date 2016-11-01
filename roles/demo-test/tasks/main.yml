@@ -15,7 +15,7 @@
 - name: Install yaml from PyPi
   become: yes
   pip:
-    name=pyyaml
+    name: pyyaml
 
 - name: Copy test files
   copy:
