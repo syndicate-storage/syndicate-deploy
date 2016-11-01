@@ -75,7 +75,7 @@
   register: gae_path_status
 
 - name: Install GAE, try again
-  shell: "cd {{ gae_path | dirname }} && unzip {{ dl_dir }}/{{ GAE_SDK | basename }}"
+  shell: "cd {{ gae_path | dirname }} && unzip {{ dl_dir }}/{{ gae_sdk | basename }}"
   when: gae_install_status.failed == true and ( gae_path_status.stat.isdir is not defined or gae_path_status.stat.isdir == false )
 
 - name: Install syndicate-ms packages
