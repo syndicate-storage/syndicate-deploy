@@ -137,10 +137,10 @@
   with_items:
     - syndicate-ms
 
-- name: Start syndicate processes
+- name: Restart syndicate processes
   service:
     name: "{{ item }}"
-    state: started
+    state: restarted
   with_items:
     - syndicate-ms
   when: inventory_hostname not in groups['syndicate-ms']
