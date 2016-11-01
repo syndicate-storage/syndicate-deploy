@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 
+#
 # Starts a Hadoop HDFS DataNode
-# 
+#
 # chkconfig: 2345 90 20
 # description: Hadoop HDFS DataNode
 
@@ -33,9 +33,9 @@ desc="Hadoop HDFS DataNode daemon"
 start() {
   echo -n $"Starting $desc (hadoop-datanode): "
   if [ -n "$HADOOP_SECURE_DN_USER" ]; then
-    daemon ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" start datanode
+    daemon -- ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" start datanode
   else
-    daemon --user hdfs ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" start datanode
+    daemon --user hdfs -- ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" start datanode
   fi
   RETVAL=$?
   echo
@@ -46,9 +46,9 @@ start() {
 stop() {
   echo -n $"Stopping $desc (hadoop-datanode): "
   if [ -n "$HADOOP_SECURE_DN_USER" ]; then
-    daemon ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" stop datanode
+    daemon -- ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" stop datanode
   else
-    daemon --user hdfs ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" stop datanode
+    daemon --user hdfs -- ${HADOOP_HOME}/sbin/hadoop-daemon.sh --config "${HADOOP_CONF_DIR}" stop datanode
   fi
   RETVAL=$?
   sleep 5

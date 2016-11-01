@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 
+#
 # Starts a Hadoop YARN proxy server
-# 
+#
 # chkconfig: 2345 80 10
 # description: Hadoop YARN proxy server
 
@@ -33,7 +33,7 @@ desc="Hadoop YARN proxy server daemon"
 
 start() {
   echo -n $"Starting $desc (hadoop-yarn-proxy-server): "
-  daemon --user yarn $HADOOP_HOME/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" start proxyserver
+  daemon --user yarn -- $HADOOP_HOME/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" start proxyserver
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && touch /var/lock/hadoop-yarn-proxy-server
@@ -42,7 +42,7 @@ start() {
 
 stop() {
   echo -n $"Stopping $desc (hadoop-yarn-proxy-server): "
-  daemon --user yarn $HADOOP_HOME/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" stop proxyserver
+  daemon --user yarn -- $HADOOP_HOME/sbin/yarn-daemon.sh --config "${HADOOP_CONF_DIR}" stop proxyserver
   RETVAL=$?
   sleep 5
   echo

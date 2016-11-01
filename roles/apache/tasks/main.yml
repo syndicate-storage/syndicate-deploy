@@ -11,7 +11,7 @@
 
 - name: create base sites dir
   file:
-    path: {{ apache_sites_dir }}
+    path: "{{ apache_sites_dir }}"
     state: directory
     owner: root
     group: root
@@ -21,7 +21,7 @@
   when: apache_ssl_enabled
   file:
     state: directory
-    dest: {{ apache_ssl_cert_dir }}
+    dest: "{{ apache_ssl_cert_dir }}"
     owner: root
     group: ssl-cert
     mode: 0750
