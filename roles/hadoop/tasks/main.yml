@@ -151,7 +151,6 @@
   with_items:
     - hadoop-namenode
     - hadoop-resourcemanager
-    - hadoop-nodemanager
 
 - name: Start hadoop processes on datanodes
   service:
