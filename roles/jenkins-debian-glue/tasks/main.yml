@@ -48,7 +48,7 @@
     mode: 0644
     owner: root
     group: root
-    dest: {{ item }}
+    dest: "{{ item }}"
   with_items:
     - "/etc/jenkins/{{ site_name }}_pub.gpg"
     - "{{ apache_sites_dir }}/{{ site_name }}/{{ csr_name }}_pub.gpg"
