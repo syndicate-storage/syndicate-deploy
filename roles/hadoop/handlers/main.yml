@@ -9,7 +9,6 @@
   with_items:
     - hadoop-namenode
     - hadoop-resourcemanager
-    - hadoop-nodemanager
 
 - name: restart-datanode
   service:
@@ -18,4 +17,3 @@
   with_items:
     - hadoop-datanode
     - hadoop-nodemanager
-
