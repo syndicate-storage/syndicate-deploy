@@ -1,18 +1,23 @@
 ---
 
-- name: setup_put_getxattr
+- name: setup_put_cat
   type: setup
   tmpdirs:
-    - name: 016_put_getxattr_builtin
+    - name: 021_put_cat_multi
       varname: config_dir
   randnames:
     - test_volume
     - test_rg
     - put_ug
     - cat_ug
+  randloop:
+    - name: test_cattimes
+      quantity: 1
   vars:
-    - name: local_file
-      value: $config_dir/local_file
+    - name: local_file1
+      value: $config_dir/local_file1
+    - name: local_file2
+      value: $config_dir/local_file2
     - name: syndicate_conf
       value: $config_dir/syndicate.conf
     - name: rg_driver
@@ -23,17 +28,16 @@
       value: $SYNDICATE_UG_ROOT/syndicate-put
     - name: cat_path
       value: $SYNDICATE_UG_ROOT/syndicate-cat
-    - name: getxattr_path
-      value: $SYNDICATE_UG_ROOT/syndicate-getxattr
-    - name: cached_blocks
-      value: '\n1111\n'
   debug: off
 
 - name: config
   type: sequential
   tasks:
-    - name: make local_file
-      command: $tasksf_dir/mkpatternfile.py $local_file 16384 abcdef
+    - name: make local_file1
+      command: $tasksf_dir/mkrandfile.py $local_file1 16384
+
+    - name: make local_file2
+      command: $tasksf_dir/mkrandfile.py $local_file2 16384
 
     - name: setup
       command: $SYNDICATE_TOOL --trust_public_key -c "$syndicate_conf" --debug setup "$SYNDICATE_ADMIN" "$SYNDICATE_PRIVKEY_PATH" "$SYNDICATE_MS"
@@ -73,11 +77,12 @@
   type: sequential
   tasks:
     - name: test put
-      command: $put_path -d2 -f -c "$syndicate_conf" -u $SYNDICATE_ADMIN -v $test_volume -g $put_ug $local_file /put-getxattr
+      command: $put_path -d2 -f -c "$syndicate_conf" -u $SYNDICATE_ADMIN -v $test_volume -g $put_ug $local_file1 /syndicate-put1 $local_file2 /syndicate-put2
 
+- name: run put/cat tests
+  type: sequential
+  loop_on: test_cattimes
+  tasks:
     - name: test cat
-      command: $cat_path -d2 -f -c "$syndicate_conf" -u $SYNDICATE_ADMIN -v $test_volume -g $cat_ug /put-getxattr
-
-    - name: getxattr
-      command: $getxattr_path -d2 -f -c "$syndicate_conf" -u $SYNDICATE_ADMIN -v $test_volume -g $cat_ug /put-getxattr user.syndicate_cached_blocks
-      containsout: $cached_blocks
+      command: $cat_path -d2 -f -c "$syndicate_conf" -u $SYNDICATE_ADMIN -v $test_volume -g $cat_ug /syndicate-put1 /syndicate-put2
+      checkout: $local_file1 $local_file2

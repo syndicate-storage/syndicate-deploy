@@ -6,7 +6,7 @@ if [ -z "`echo $PATH | grep google`" ]; then
     export PATH=${PATH}:~/google_appengine
 fi
 
-export SYNDICATE_MS="http://ms:8080"
+export SYNDICATE_MS="http://ms:28080"
 export SYNDICATE_MS_ROOT=/usr/src/syndicate/ms
 export SYNDICATE_MS_KEYDIR=${SYNDICATE_MS_ROOT}
 export SYNDICATE_PRIVKEY_PATH=${SYNDICATE_MS_KEYDIR}/admin.pem
