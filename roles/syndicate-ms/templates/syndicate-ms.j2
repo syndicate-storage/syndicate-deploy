@@ -44,7 +44,7 @@ start() {
       return 0
   else
       echo -n $"Starting $desc: "
-      daemon --name=${PNAME} --pidfile=${PIDFILE} -- ${GAE_PATH}/dev_appserver.py --admin_host=${GAE_ADMIN_HOST} --admin_port=${GAE_ADMIN_PORT} --host=${GAE_SERVICE_HOST} --port=${GAE_SERVICE_PORT} --storage_path=${MS_DATA_DIR} --skip_sdk_update_check=true ${MS_SRC_DIR}
+      daemon --name=${PNAME} --pidfile=${PIDFILE} --output=user.info -- ${GAE_PATH}/dev_appserver.py --admin_host=${GAE_ADMIN_HOST} --admin_port=${GAE_ADMIN_PORT} --host=${GAE_SERVICE_HOST} --port=${GAE_SERVICE_PORT} --storage_path=${MS_DATA_DIR} --skip_sdk_update_check=true ${MS_SRC_DIR}
       RETVAL=$?
       echo
       [ $RETVAL -eq 0 ] && touch /var/lock/syndicate-ms
