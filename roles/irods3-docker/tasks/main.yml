@@ -1,0 +1,89 @@
+---
+# file: roles/irods3-docker/tasks/main.yml
+
+# Use docker build with a Dockerfile so we can build a
+# docker image of iRODS3
+
+- name: Make irods3_docker_path
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ irods3_docker_path }}"
+    - "{{ irods3_docker_path }}/reConfigs"
+    - "{{ irods3_docker_path }}/serverconfig"
+    - "{{ irods3_docker_path }}/commands"
+    - "{{ irods3_docker_path }}/setup"
+    - "{{ irods3_docker_path }}/sourcecode"
+    - "{{ irods3_docker_path }}/profile.d"
+
+- name: Copy docker scripts
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ irods3_docker_path }}/{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "655"
+  with_items:
+    - Dockerfile
+    - reConfigs/ipc-amqp.re
+    - reConfigs/ipc-custom.re
+    - reConfigs/ipc-env.re
+    - reConfigs/ipc-json.re
+    - reConfigs/ipc-logic.re
+    - reConfigs/ipc-uuid.re
+    - serverconfig/server.config.in
+    - commands/amqptopicsend.py
+    - commands/generateuuid.sh
+    - setup/odbc.ini
+    - setup/setup_postgres.sh
+    - setup/setup_rabbitMQ.sh
+    - setup/setup.sql
+    - setup/setup_irods.sh
+    - setup/bms.config
+    - setup/irods.config
+    - setup/start_service.sh
+    - sourcecode/collection.c
+    - profile.d/irods.sh
+  register: docker_scripts_copied
+
+- name: Check for docker containers
+  command: "docker ps -a --filter=status=running"
+  register: docker_running
+
+- name: Stop running docker containers
+  command: "docker stop {{ irods3_docker_container_name }}"
+  when: docker_running.stdout.find("{{ irods3_docker_container_name }}") != -1
+
+- name: Check for docker containers
+  command: "docker ps -a"
+  register: docker_stopped
+
+- name: Remove stopped docker containers
+  command: "docker rm {{ irods3_docker_container_name }}"
+  when: docker_stopped.stdout.find("{{ irods3_docker_container_name }}") != -1
+
+- name: Check for docker images
+  command: "docker images"
+  register: docker_images
+
+- name: Remove old docker images
+  command: "docker rmi {{ irods3_docker_image_name }}"
+  when: docker_images.stdout.find("{{ irods3_docker_image_name }}") != -1 and docker_scripts_copied.changed
+
+- name: Build docker host images
+  command: "docker build -t {{ irods3_docker_image_name }} {{ irods3_docker_path }}"
+  when: docker_images.stdout.find("{{ irods3_docker_image_name }}") == -1 or docker_scripts_copied.changed
+
+- name: Check for docker containers
+  command: "docker ps -a --filter=status=running"
+  register: docker_running
+
+- name: Run docker container
+  docker:
+    image: "{{ irods3_docker_image_name }}"
+    name: "{{ irods3_docker_container_name }}"
+    state: reloaded
+    ports:
+      - "{{ config_irods_port_main }}:{{ config_irods_port_main }}"
+  when: docker_scripts_copied.changed == true or docker_running.stdout.find("{{ irods3_docker_container_name }}") == -1

@@ -1,0 +1,5 @@
+---
+
+allowed_tcp_ports:
+  # for iCAT
+  - 1247
