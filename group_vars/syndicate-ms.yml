@@ -1,7 +1,9 @@
 ---
 
 allowed_tcp_ports:
-  - "28080:28089" # for ms service
+  # for ms service
+  - "28080:28089"
 
 allowed_local_tcp_ports:
-  - "28090:28099" # for ms admin
+  # for ms admin
+  - "28090:28099"

@@ -1,0 +1,34 @@
+---
+# irods3-docker/defaults/main.yml
+
+irods3_docker_path: "/opt/irods3-docker"
+irods3_docker_image_name: "irods3-docker"
+irods3_docker_container_name: "irods3-docker"
+
+# experimental
+# iRODS configuration defaults
+config_amqp_host: 'localhost'
+config_amqp_port: 5672
+config_amqp_user: 'irods_ampq_user'
+config_amqp_password: 'irods_ampq_pass'
+
+config_database_name: iCAT
+config_database_hostname: localhost
+config_database_port: 5432
+
+config_irods_key_zone: TEMPORARY_zone_key
+config_irods_key_negotiation: TEMPORARY_32byte_negotiation_key
+config_irods_key_controlplane: TEMPORARY_32byte_ctrl_plane_key
+config_irods_path: "/opt/irods-legacy-3.3.1"
+config_irods_port_main: 1247
+config_irods_port_controlplane: 1248
+config_irods_port_filetxrangebegin: 20000
+config_irods_port_filetxrangeend: 20199
+config_irods_resourcename: demoResc
+config_irods_users_primary_username: irods
+config_irods_users_primary_password: irods
+config_irods_users_admin_username: rods
+config_irods_users_admin_password: rods
+config_irods_vaultdir: "{{ config_irods_path }}/iRODS/Vault"
+config_irods_validationbaseurl: "off"
+config_irods_zone: iplant
