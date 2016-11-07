@@ -5,4 +5,5 @@ BUILD_MS := .
 
 include configure_ms.mk
 
-all: $(BUILD_MS)/app.yaml
+all: clean_ms
+    $(BUILD_MS)/app.yaml

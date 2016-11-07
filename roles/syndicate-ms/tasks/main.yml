@@ -100,13 +100,6 @@
     - app.yamlin
     - Makefile
 
-- name: Clear syndicate-ms configurations
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - "{{ ms_path }}/app.yaml"
-
 - name: Configure syndicate-ms
   command: "make all"
   args:
