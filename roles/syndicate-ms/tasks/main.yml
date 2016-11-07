@@ -100,6 +100,13 @@
     - app.yamlin
     - Makefile
 
+- name: Clear syndicate-ms configurations
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ ms_path }}/app.yaml"
+
 - name: Configure syndicate-ms
   command: "make all"
   args:
@@ -148,7 +155,7 @@
     - syndicate-ms
 
 - name: Setup syndicate tool
-  command: "syndicate --trust_public_key setup {{ syndicate_ms_admin }} /usr/src/syndicate/ms/admin.pem http://localhost:{{ gae_service_port }}"
+  command: "syndicate --trust_public_key setup {{ syndicate_ms_admin }} /usr/src/syndicate/ms/admin.pem http://{{ syndicate_ms_host }}:{{ gae_service_port }}"
   become: true
   become_user: "{{ syndicate_user }}"
   args:
