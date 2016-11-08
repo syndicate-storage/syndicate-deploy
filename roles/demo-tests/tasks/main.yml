@@ -1,5 +1,5 @@
 ---
-# demo-test/tasks/main.yml
+# demo-tests/tasks/main.yml
 # Configures the demo test environment
 
 - name: Install test dependency packages
@@ -9,6 +9,7 @@
     cache_valid_time: 3600
     state: present
   with_items:
+    - git
     - valgrind
     - python-pip
 
@@ -17,13 +18,19 @@
   pip:
     name: pyyaml
 
-- name: Copy test files
-  copy:
-    src: demo-tests
-    dest: /opt
+- name: Clone syndicate-tests repo
+  git:
+    repo: https://github.com/syndicate-storage/syndicate-tests
+    dest: /opt/syndicate-tests
+    version: master
+
+- name: Fix ownership of syndicate-tests
+  file:
+    path: /opt/syndicate-tests
     owner: syndicate
     group: syndicate
-    directory_mode: "u=rwx,g=rx,o=rx"
+    recurse: yes
+    state: directory
 
 - name: Copy legacy test files
   copy:
@@ -43,18 +50,23 @@
     owner: syndicate
     group: syndicate
   with_items:
-    - /opt/demo-tests/results
-    - /opt/demo-tests/output
+    - /opt/results
+    - /opt/output
     - /opt/legacy-tests/results
     - /opt/legacy-tests/output
 
-- name: Create demo-tests softlink
+- name: Create demo-tests softlinks
   file:
-    src: /opt/demo-tests
-    dest: /home/syndicate/demo-tests
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     owner: syndicate
     group: syndicate
     state: link
+  with_items:
+    - src: /opt/syndicate-tests
+      dest: /home/syndicate/syndicate-tests
+    - src: /usr/src/syndicate/ms
+      dest: /opt/ms
 
 - name: Get syndicate-ms certs
   copy:

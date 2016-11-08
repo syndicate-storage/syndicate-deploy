@@ -51,9 +51,9 @@
   roles:
     - syndicate
 
-- name: Setup demo test environment
+- name: Setup demo tests environment
   hosts: docker-synclient1
   connection: docker
   roles:
     - syndicate-ms
-    - demo-test
+    - demo-tests
