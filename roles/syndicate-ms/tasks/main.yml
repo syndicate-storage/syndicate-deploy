@@ -143,9 +143,9 @@
     state: restarted
   with_items:
     - syndicate-ms
-  when: inventory_hostname not in groups['syndicate-ms']
+  when: inventory_hostname in groups['syndicate-ms']
 
-- name: Fetch syndicate certs for demo-test
+- name: Fetch syndicate certs for demo-tests
   fetch:
     src: "{{ ms_path }}/{{ item }}"
     dest: "/tmp/"
