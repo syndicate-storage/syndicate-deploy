@@ -86,12 +86,15 @@
     state: present
   with_items:
     - syndicate-ms
+    - syndicate-core
 
-- name: Copy syndicate-ms files
-  copy:
-    src: "{{ item }}"
-    dest: "{{ ms_path }}"
+- name: Template syndicate-ms files
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ ms_path }}/{{ item }}"
     owner: "{{ syndicate_user }}"
+    group: "{{ syndicate_user }}"
+    mode: 0755
   with_items:
     - configure_ms.mk
     - app.yamlin
@@ -143,29 +146,10 @@
     state: restarted
   with_items:
     - syndicate-ms
-  when: inventory_hostname in groups['syndicate-ms']
 
-- name: Fetch syndicate certs for demo-tests
-  fetch:
-    src: "{{ ms_path }}/{{ item }}"
-    dest: "/tmp/"
-    flat: yes
-  with_items:
-    - admin.pub
-    - admin.pem
-    - syndicate.pub
-    - syndicate.pem
-  when: inventory_hostname in groups['syndicate-ms']
-
-- name: Link syndicate certs
-  file:
-    src: "/opt/ms_certs/{{ item }}"
-    dest: "{{ ms_path }}/{{ item }}"
-    state: link
-    force: yes
-  with_items:
-    - admin.pub
-    - admin.pem
-    - syndicate.pub
-    - syndicate.pem
-  when: inventory_hostname not in groups['syndicate-ms']
+- name: Setup syndicate tool
+  command: "syndicate --trust_public_key setup {{ syndicate_ms_admin }} /usr/src/syndicate/ms/admin.pem http://{{ syndicate_ms_host }}:{{ gae_service_port }}"
+  become: true
+  become_user: "{{ syndicate_user }}"
+  args:
+    chdir: "/home/{{ syndicate_user }}"

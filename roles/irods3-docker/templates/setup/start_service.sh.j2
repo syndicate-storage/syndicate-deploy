@@ -1,0 +1,19 @@
+#!/bin/bash
+sudo service postgresql start
+sudo service rabbitmq-server start
+
+# Build iRODS
+# build when service starts because iRODS build process memorizes hostname somehow so it prevents
+# the prebuilt binary to be reused at different hosts/containers
+OLDPWD=$(pwd)
+cd /opt/irods-legacy-3.3.1/iRODS
+yes | ./irodssetup
+cd $OLDPWD
+
+/opt/irods-legacy-3.3.1/iRODS/irodsctl start
+
+
+echo "iRODS3 is standby!"
+while true; do sleep 1000; done
+
+#nohup {{ config_irods_path }}/bms/start.sh {{ config_irods_path }}/bms/bms.config &
