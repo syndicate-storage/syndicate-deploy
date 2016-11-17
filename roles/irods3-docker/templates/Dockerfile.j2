@@ -1,0 +1,100 @@
+# Syndicate-deploy-irods3-docker
+#
+# VERSION	1.0
+
+FROM	ubuntu:14.04
+MAINTAINER	Illyoung Choi <iychoi@email.arizona.edu>
+
+##############################################
+# Setup an iRODS account
+##############################################
+ENV USER {{ config_irods_users_primary_username }}
+ENV HOME /home/$USER
+
+
+RUN useradd $USER && echo "$USER:$USER" | chpasswd && \
+    echo "$USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+    mkdir $HOME && \
+    chown -R $USER:$USER $HOME
+
+##############################################
+# Setup utility packages
+##############################################
+RUN apt-get update && \
+    apt-get install -y wget unzip python-pip build-essential ssh fuse && \
+    usermod -aG fuse $USER
+
+##############################################
+# Setup iRODS3 Commons
+##############################################
+RUN apt-get install -y openjdk-7-jdk ant git odbc-postgresql postgresql-9.3 \
+                       python-pika python-psycopg2 rabbitmq-server unixodbc-dev \
+                       uuid-dev uuid-runtime
+
+# Setup rabbitmq-plugins
+RUN rabbitmq-plugins enable rabbitmq_management
+
+# Link psqlodbca.so
+RUN ln -s /usr/lib/x86_64-linux-gnu/odbc/psqlodbca.so /usr/lib/postgresql/9.3/lib/libodbcpsql.so
+
+# download packages
+ENV IRODS_DOWNLOADS /opt/downloads
+
+WORKDIR /opt
+
+RUN mkdir $IRODS_DOWNLOADS && \
+    wget -O $IRODS_DOWNLOADS/irods-legacy-3.3.1.zip https://github.com/irods/irods-legacy/archive/3.3.1.zip && \
+    wget -O $IRODS_DOWNLOADS/irods-setavu-mod.zip https://github.com/cyverse/irods-setavu-mod/archive/master.zip && \
+    wget -O $IRODS_DOWNLOADS/bms.zip https://github.com/iychoi/iPlantBorderMessageServer/archive/master.zip && \
+    unzip $IRODS_DOWNLOADS/irods-legacy-3.3.1.zip && \
+    unzip $IRODS_DOWNLOADS/irods-setavu-mod.zip && \
+    unzip $IRODS_DOWNLOADS/bms.zip
+# this will create
+# /opt/irods-legacy-3.3.1
+# /opt/irods-setavu-mod-master
+# /opt/iPlantBorderMessageServer-master
+
+RUN mv irods-setavu-mod-master /opt/irods-legacy-3.3.1/iRODS/modules/setavu && \
+    mv iPlantBorderMessageServer-master bms
+
+# Copy iRODS rules and command scripts
+ADD reConfigs /opt/irods-legacy-3.3.1/iRODS/server/config/reConfigs/
+ADD serverconfig /opt/irods-legacy-3.3.1/iRODS/server/config/
+ADD commands /opt/irods-legacy-3.3.1/iRODS/server/bin/cmd/
+ADD sourcecode /opt/irods-legacy-3.3.1/iRODS/server/core/src/
+RUN chown -R $USER /opt/irods-legacy-3.3.1 && \
+    chmod -R 744 /opt/irods-legacy-3.3.1
+
+ADD setup $IRODS_DOWNLOADS
+RUN chown -R $USER $IRODS_DOWNLOADS && \
+    chmod -R 777 $IRODS_DOWNLOADS
+
+RUN mv $IRODS_DOWNLOADS/odbc.ini $HOME/.odbc.ini && \
+    mv $IRODS_DOWNLOADS/irods.config /opt/irods-legacy-3.3.1/iRODS/config/ && \
+    mv $IRODS_DOWNLOADS/bms.config /opt/bms/
+
+RUN chown -R $USER /opt/bms && \
+    chmod -R 744 /opt/bms
+
+# setup database
+RUN $IRODS_DOWNLOADS/setup_postgres.sh
+
+# setup rabbitMQ
+RUN $IRODS_DOWNLOADS/setup_rabbitMQ.sh
+
+# set PATH
+ADD profile.d /etc/profile.d/
+RUN chmod -R 755 /etc/profile.d/irods.sh
+ENV IRODS_HOME /opt/irods-legacy-3.3.1
+ENV PATH $IRODS_HOME/iRODS/server/bin/cmd:$IRODS_HOME/iRODS/clients/icommands/bin:$PATH
+
+# setup irods
+USER $USER
+WORKDIR $HOME
+RUN $IRODS_DOWNLOADS/setup_irods.sh
+
+
+
+# start irods
+EXPOSE {{ config_irods_port_main }}
+CMD $IRODS_DOWNLOADS/start_service.sh

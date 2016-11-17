@@ -9,9 +9,9 @@ BUILD_MS ?=
 # Where to put generated pub/priv keys
 KEY_FILES ?= $(CONFIG_DIR)
 
-MS_APP_NAME			?= syndicate-ms
-MS_APP_PUBLIC_HOST	?= ms
-MS_APP_ADMIN_EMAIL	?= syndicate-ms@example.com
+MS_APP_NAME			?= {{ syndicate_app_name }}
+MS_APP_PUBLIC_HOST	?= {{ syndicate_ms_host }}
+MS_APP_ADMIN_EMAIL	?= {{ syndicate_ms_admin }}
 
 MS_APP_ADMIN_PUBLIC_KEY		?= $(KEY_FILES)/admin.pub
 MS_APP_ADMIN_PRIVATE_KEY	?= $(KEY_FILES)/admin.pem
@@ -47,4 +47,3 @@ clean_ms:
 
 clean_certs: clean_ms
 	rm -f $(MS_APP_ADMIN_PUBLIC_KEY) $(MS_APP_ADMIN_PRIVATE_KEY) $(MS_APP_PUBLIC_KEY) $(MS_APP_PRIVATE_KEY)
-

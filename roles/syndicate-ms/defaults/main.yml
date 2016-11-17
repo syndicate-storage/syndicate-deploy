@@ -4,9 +4,14 @@
 # Download defaults
 dl_dir: /opt/downloads
 
-# Syndicate-ms Defaults
+# Syndicate-ms defaults
+syndicate_ms_host: demo1.opencloud.cs.arizona.edu
+syndicate_app_name: syndicate-ms
 syndicate_user: syndicate
 syndicate_password: syndicate
+
+syndicate_ms_admin: "{{ syndicate_user }}@example.com"
+
 
 # GAE config
 gae_sdk: https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.40.zip

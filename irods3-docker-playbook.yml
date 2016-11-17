@@ -1,0 +1,11 @@
+---
+# Install irods3-docker
+
+- hosts: irods
+  become: yes
+  roles:
+    - common-prep
+    - ssh-lockdown
+    - ufw
+    - docker
+    - irods3-docker
