@@ -117,6 +117,8 @@
     - hdfs-site.xml
     - mapred-site.xml
     - yarn-site.xml
+    - yarn-env.sh
+    - hadoop-env.sh
   notify:
     - restart-namenode
     - restart-datanode
