@@ -1,0 +1,8 @@
+---
+# Enable debugging capabilities on the testing client
+# this can be enabled at the command line with "-e enable_debugging=True"
+
+# Setting to true tells ansible to build and install syndicate from source code with debugging options/symbols enabled
+# Setting to false will install syndicate via packages (no debug symbols or source) from butler
+
+enable_debugging: False 
