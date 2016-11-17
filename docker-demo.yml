@@ -9,6 +9,8 @@
     include_vars: vars/irods_version.yml
   - name: Docker configuration variables
     include_vars: vars/docker_demo_config.yml
+  - name: Demo-tests debug options
+    include_vars: vars/demo_tests_config.yml
 
 - name: Build docker containers
   hosts: all

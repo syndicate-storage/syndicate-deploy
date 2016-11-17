@@ -21,9 +21,9 @@
     cache_valid_time: 3600
     state: installed
   with_items:
-    - unzip
-    - make
     - daemon
+    - make
+    - unzip
 
 - name: Trust butler opencloud apt repo
   apt_key:
