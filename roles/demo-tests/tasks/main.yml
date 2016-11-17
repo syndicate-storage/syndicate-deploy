@@ -1,0 +1,154 @@
+---
+# demo-tests/tasks/main.yml
+# Configures the demo test environment
+
+- name: Install test dependency packages
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: present
+  with_items:
+    - git
+    - python-pip
+    - valgrind
+
+- name: Install debug dependency packages
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: present
+  with_items:
+    - openssh-server
+    - ddd
+  when: "{{ enable_debugging | bool }}"
+
+- name: Syndicate build dependencies
+  become: yes
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: installed
+  with_items:
+    - build-essential
+    - cython
+    - protobuf-compiler
+    - libattr1-dev
+    - libcurl4-openssl-dev  
+    - libfuse-dev  
+    - libjson0
+    - libjson0-dev
+    - libmicrohttpd-dev
+    - libprotobuf-dev
+    - libssl-dev
+  when: "{{ enable_debugging | bool }}"
+
+- name: Clone syndicate repos
+  git:
+    repo: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    force: yes
+    version: master
+  with_items:
+    - src: https://github.com/syndicate-storage/syndicate-ug-tools
+      dest: /opt/downloads/syndicate-ug-tools
+    - src: https://github.com/syndicate-storage/syndicate-core
+      dest: /opt/downloads/syndicate-core
+    - src: https://github.com/jcnelson/fskit
+      dest: /opt/downloads/fskit
+  when: "{{ enable_debugging | bool }}"
+
+- name: Make fskit
+  shell: "make && make install PREFIX=/usr"
+  args:
+    chdir: /opt/downloads/fskit
+  when: "{{ enable_debugging | bool }}"
+#    creates: "{{ ms_path }}/app.yaml"
+
+- name: Make syndicate
+  shell: "make all && make install PREFIX=/usr"
+  args:
+    chdir: /opt/downloads/syndicate-core
+  when: "{{ enable_debugging | bool }}"
+
+- name: Make syndicate-ug-tools
+  shell: "make all && make install PREFIX=/usr"
+  args:
+    chdir: /opt/downloads/syndicate-ug-tools
+  when: "{{ enable_debugging | bool }}"
+
+- name: Install yaml from PyPi
+  become: yes
+  pip:
+    name: pyyaml
+
+- name: Clone syndicate-tests repo
+  git:
+    repo: https://github.com/syndicate-storage/syndicate-tests
+    dest: /opt/syndicate-tests
+    force: yes
+    version: master
+
+- name: Fix ownership of syndicate-tests
+  file:
+    path: /opt/syndicate-tests
+    owner: syndicate
+    group: syndicate
+    recurse: yes
+    state: directory
+
+- name: Copy legacy test files
+  copy:
+    src: legacy-tests
+    dest: /opt
+    owner: syndicate
+    group: syndicate
+    directory_mode: "u=rwx,g=rx,o=rx"
+
+- name: Fix script permissions
+  command: 'find /opt \( -name "*.py" -o -name "*.sh" \) -exec chmod +x {} \;'
+
+- name: Create test results directories
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: syndicate
+    group: syndicate
+  with_items:
+    - /opt/results
+    - /opt/output
+    - /opt/legacy-tests/results
+    - /opt/legacy-tests/output
+
+- name: Create demo-tests softlinks
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: syndicate
+    group: syndicate
+    state: link
+  with_items:
+    - src: /usr/src/syndicate/ms
+      dest: /opt/ms
+    - src: /usr/lib/syndicate
+      dest: /usr/local/lib/syndicate
+    - src: /opt/syndicate-tests
+      dest: /home/syndicate/syndicate-tests
+    - src: /opt/results
+      dest: /home/syndicate/results
+    - src: /opt/output
+      dest: /home/syndicate/output
+
+- name: Get syndicate-ms certs
+  copy:
+    src: "/tmp/{{ item }}"
+    dest: "/opt/ms_certs/"
+    owner: syndicate
+    group: syndicate
+  with_items:
+    - admin.pub
+    - admin.pem
+    - syndicate.pub
+    - syndicate.pem
