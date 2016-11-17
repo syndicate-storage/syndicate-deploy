@@ -83,7 +83,7 @@
     dest: "{{ dl_dir }}/{{ item.url | basename }}"
   with_items:
     - url: https://butler.opencloud.cs.arizona.edu/demo_apps/libra.tar.gz
-      cksum: "sha256:5c081724ecbda3bea3c5e110757fa93ccd9a390daf780b5ed8b419be294ce214"
+      cksum: "sha256:bc301eebc46717adc03fa279ab46ccde59e9acacc8e7606ddd4c50f693696027"
 
 - name: Create libra dir
   file:
