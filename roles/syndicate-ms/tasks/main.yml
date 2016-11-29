@@ -51,6 +51,13 @@
     name: "{{ syndicate_user }}"
     password: "{{ syndicate_password | password_hash('sha512') }}"
 
+- name: Add syndicate user to sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: "^%{{ syndicate_user }}"
+    line: "%{{ syndicate_user }} ALL=(ALL) NOPASSWD: ALL"
+
 - name: Make dl_dir
   file:
     path: "{{ dl_dir }}"
