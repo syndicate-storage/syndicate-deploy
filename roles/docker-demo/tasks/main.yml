@@ -34,5 +34,8 @@
     name: "{{ inventory_hostname }}"
     state: reloaded
     publish_all_ports: yes
+    devices: "/dev/fuse:/dev/fuse:rwm"
+    cap_add: SYS_ADMIN
+    privileged: yes
     command: "sleep {{ docker_container_uptime }}"
   when: docker_running.changed == false or docker_running.stdout.find("demo") == -1

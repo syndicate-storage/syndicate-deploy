@@ -9,9 +9,30 @@
     cache_valid_time: 3600
     state: present
   with_items:
+    - fuse
     - git
     - python-pip
     - valgrind
+
+- name: Copy fstest Posix fs test suite dependency
+  copy:
+    src: fstest
+    dest: /opt/downloads
+    owner: syndicate
+    group: syndicate
+    directory_mode: "u=rwx,g=rx,o=rx"
+
+- name: Make fstest
+  shell: "make"
+  args:
+    chdir: /opt/downloads/fstest
+
+- name: Install fstest
+  copy:
+    src: "/opt/downloads/fstest/fstest"
+    dest: "/usr/bin"
+    mode: 0755
+    remote_src: true
 
 - name: Install debug dependency packages
   apt:
@@ -98,6 +119,11 @@
     group: syndicate
     recurse: yes
     state: directory
+
+- name: Add syndicate to fuse group
+  user:
+    name: syndicate
+    groups: fuse
 
 - name: Copy legacy test files
   copy:
