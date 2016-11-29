@@ -153,6 +153,7 @@
     state: restarted
   with_items:
     - syndicate-ms
+  when: inventory_hostname in groups['syndicate-ms']
 
 - name: Setup syndicate tool
   command: "syndicate --trust_public_key setup {{ syndicate_ms_admin }} /usr/src/syndicate/ms/admin.pem http://{{ syndicate_ms_host }}:{{ gae_service_port }}"
@@ -160,3 +161,29 @@
   become_user: "{{ syndicate_user }}"
   args:
     chdir: "/home/{{ syndicate_user }}"
+
+
+- name: Fetch syndicate certs for demo-tests
+  fetch:
+    src: "{{ ms_path }}/{{ item }}"
+    dest: "/tmp/"
+    flat: yes
+  with_items:
+    - admin.pub
+    - admin.pem
+    - syndicate.pub
+    - syndicate.pem
+  when: inventory_hostname in groups['syndicate-ms']
+
+- name: Link syndicate certs
+  file:
+    src: "/opt/ms_certs/{{ item }}"
+    dest: "{{ ms_path }}/{{ item }}"
+    state: link
+    force: yes
+  with_items:
+    - admin.pub
+    - admin.pem
+    - syndicate.pub
+    - syndicate.pem
+  when: inventory_hostname not in groups['syndicate-ms']
