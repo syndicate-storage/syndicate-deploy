@@ -5,7 +5,6 @@
 dl_dir: /opt/downloads
 
 # Syndicate-ms defaults
-syndicate_ms_host: demo1.opencloud.cs.arizona.edu
 syndicate_app_name: syndicate-ms
 syndicate_user: syndicate
 syndicate_password: syndicate
