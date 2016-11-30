@@ -161,7 +161,13 @@
   become_user: "{{ syndicate_user }}"
   args:
     chdir: "/home/{{ syndicate_user }}"
+  register: syncommand_result
+  ignore_errors: true
+  when: inventory_hostname in groups['syndicate-ms']
 
+- name: Check syndicate tool setup failure conditions
+  fail: msg="syndicate tool failed to configure"
+  failed_when: "syncommand_result|failed and 'already set up' not in syncommand_result.stderr and syncommand_result.stderr != ''" #fails if previously configured or has no stderr
 
 - name: Fetch syndicate certs for demo-tests
   fetch:
