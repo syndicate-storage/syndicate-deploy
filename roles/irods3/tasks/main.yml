@@ -153,8 +153,8 @@
   become_user: "{{ config_irods_users_primary_username }}"
   args:
     chdir: "{{ config_irods_path }}/iRODS"
-  ignore_errors: true
   register: irods_stat
+  ignore_errors: true
 
 # The first attempt does not connect to the database...
 # try again, it should work this time
@@ -163,7 +163,7 @@
   become_user: "{{ config_irods_users_primary_username }}"
   args:
     chdir: "{{ config_irods_path }}/iRODS"
-  when: irods_stat.failed == true
+  when: irods_stat|failed
 
 - name: Set PATH for server commands
   lineinfile: dest="/home/{{ config_irods_users_primary_username }}/.bashrc" line='export PATH=$PATH:{{ config_irods_path }}/iRODS/server/bin/cmd' insertafter='EOF' regexp='export PATH=$PATH:{{ config_irods_path }}/iRODS/server/bin/cmd' state=present
