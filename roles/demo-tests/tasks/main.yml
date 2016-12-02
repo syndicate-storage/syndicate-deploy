@@ -167,14 +167,20 @@
     - src: /opt/output
       dest: /home/syndicate/output
 
-- name: Get syndicate-ms certs
-  copy:
-    src: "/tmp/{{ item }}"
-    dest: "/opt/ms_certs/"
-    owner: syndicate
-    group: syndicate
-  with_items:
-    - admin.pub
-    - admin.pem
-    - syndicate.pub
-    - syndicate.pem
+- name: Adjust syndicate-tests port config
+  lineinfile:
+    dest: /opt/syndicate-tests/config.sh
+    state: present
+    regexp: ".*SYNDICATE_MS.*:8080"
+    line: 'export SYNDICATE_MS="http://ms:28080"'
+
+- name: Adjust syndicate-tests admin config
+  lineinfile:
+    dest: /opt/syndicate-tests/config.sh
+    state: present
+    regexp: ".*SYNDICATE_ADMIN.*"
+    line: 'export SYNDICATE_ADMIN="syndicate@example.com"'
+
+
+
+

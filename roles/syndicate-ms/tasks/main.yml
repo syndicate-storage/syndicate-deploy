@@ -85,15 +85,15 @@
   shell: "cd {{ gae_path | dirname }} && unzip {{ dl_dir }}/{{ gae_sdk | basename }}"
   when: gae_install_status.failed == true and ( gae_path_status.stat.isdir is not defined or gae_path_status.stat.isdir == false )
 
-- name: Install syndicate-ms packages
+- name: Install syndicate packages
   apt:
     name: "{{ item }}"
     update_cache: yes
     cache_valid_time: 3600
     state: present
   with_items:
-    - syndicate-ms
     - syndicate-core
+    - syndicate-ms
 
 - name: Template syndicate-ms files
   template:
@@ -106,6 +106,23 @@
     - configure_ms.mk
     - app.yamlin
     - Makefile
+  when: inventory_hostname in groups['syndicate-ms']
+
+- name: Get syndicate-ms files for demo-tests
+  copy:
+    src: "/tmp/{{ item }}"
+    dest: "{{ ms_path }}/{{ item }}"
+    owner: syndicate
+    group: syndicate
+  with_items:
+    - admin.pub
+    - admin.pem
+    - syndicate.pub
+    - syndicate.pem
+    - configure_ms.mk
+    - app.yamlin
+    - Makefile
+  when: inventory_hostname not in groups['syndicate-ms']
 
 - name: Configure syndicate-ms
   command: "make all"
@@ -169,7 +186,7 @@
   fail: msg="syndicate tool failed to configure"
   failed_when: "syncommand_result|failed and 'already set up' not in syncommand_result.stderr and syncommand_result.stderr != ''" #fails if previously configured or has no stderr
 
-- name: Fetch syndicate certs for demo-tests
+- name: Save syndicate certs for demo-tests
   fetch:
     src: "{{ ms_path }}/{{ item }}"
     dest: "/tmp/"
@@ -179,17 +196,7 @@
     - admin.pem
     - syndicate.pub
     - syndicate.pem
+    - configure_ms.mk
+    - app.yamlin
+    - Makefile
   when: inventory_hostname in groups['syndicate-ms']
-
-- name: Link syndicate certs
-  file:
-    src: "/opt/ms_certs/{{ item }}"
-    dest: "{{ ms_path }}/{{ item }}"
-    state: link
-    force: yes
-  with_items:
-    - admin.pub
-    - admin.pem
-    - syndicate.pub
-    - syndicate.pem
-  when: inventory_hostname not in groups['syndicate-ms']
