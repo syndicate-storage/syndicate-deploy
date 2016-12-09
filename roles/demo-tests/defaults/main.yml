@@ -1,0 +1,5 @@
+---
+# demo-tests/defaults/main.yml
+
+# Download defaults
+dl_dir: /opt/downloads

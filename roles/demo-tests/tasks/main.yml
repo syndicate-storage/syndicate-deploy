@@ -43,7 +43,15 @@
   with_items:
     - openssh-server
     - ddd
+    - libtool
+    - gettext
+    - automake
   when: "{{ enable_debugging | bool }}"
+
+- name: Restart sshd to enable remote X11 use
+  service:
+    name: ssh
+    state: restarted
 
 - name: Syndicate build dependencies
   become: yes
@@ -79,6 +87,30 @@
       dest: /opt/downloads/syndicate-core
     - src: https://github.com/jcnelson/fskit
       dest: /opt/downloads/fskit
+  when: "{{ enable_debugging | bool }}"
+
+- name: Download sources
+  get_url:
+    url: "{{ item.url }}"
+    checksum: "{{ item.cksum }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - url: "https://github.com/libfuse/libfuse/archive/fuse_2_9_2.tar.gz"
+      cksum: "sha256:b8c035bb8becb9ae1374f16a13c13b66f05e199eb42c7f97f4efdff9bc46657c"
+      dest: "{{ dl_dir }}/fuse_2_9_2.tar.gz"
+  when: "{{ enable_debugging | bool }}"
+
+- name: Uncompress Fuse
+  unarchive:
+    src: "{{ dl_dir }}/fuse_2_9_2.tar.gz"
+    dest: "{{ dl_dir }}"
+    copy: no
+  when: "{{ enable_debugging | bool }}"
+
+- name: Make Fuse
+  shell: "./makeconf.sh && ./configure && make && make install"
+  args:
+    chdir: /opt/downloads/libfuse-fuse_2_9_2
   when: "{{ enable_debugging | bool }}"
 
 - name: Make fskit
@@ -181,6 +213,9 @@
     regexp: ".*SYNDICATE_ADMIN.*"
     line: 'export SYNDICATE_ADMIN="syndicate@example.com"'
 
-
-
-
+- name: Adjust syndicate-tests LD_LIBRARY_PATH
+  lineinfile:
+    dest: /opt/syndicate-tests/config.sh
+    state: present
+    regexp: ".*LD_LIBRARY_PATH.*"
+    line: 'export LD_LIBRARY_PATH=/usr/local/lib'
