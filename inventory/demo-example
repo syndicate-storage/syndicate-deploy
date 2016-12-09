@@ -4,8 +4,8 @@ ansible_become_method=sudo
 ansible_become_pass=<password>
 
 [demo]
-demo1.opencloud.cs.arizona.edu
-demo2.opencloud.cs.arizona.edu
+demo1.opencloud.cs.arizona.edu alias=ms
+demo2.opencloud.cs.arizona.edu alias=irods
 
 [syndicate-ms]
 demo1.opencloud.cs.arizona.edu
