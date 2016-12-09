@@ -18,6 +18,8 @@ $ ansible-playbook -i inventory/demo-example demo-playbook.yml
 
 * "-e irods\_version=\<version number\>"
   - Specify the iRODS version to install (default = "3")
+* "-e enable\_debugging=True"
+  - Configure the demo-tests environment to build syndicate from source and install all dependencies for debugging (default = "False")
 * "-e docker\_preload\_packages=\<true|false\>"
   - Only for Docker, tell docker to pre-load prerequisite iRODS packages to the docker image (saves time if you plan to run multiple iRODS install tests, default = "false")
 * "-e docker\_container\_uptime=\<time\>"
@@ -30,7 +32,7 @@ $ ansible-playbook -i inventory/demo-example demo-playbook.yml
 ```
 docker exec -it docker-synclient1 bash
 su - syndicate
-cd /opt/demo-tests && ./testwrapper.sh
+cd syndicate-tests && ./testwrapper.sh
 ```
 
 ## `jenkins-playbook.yml`
