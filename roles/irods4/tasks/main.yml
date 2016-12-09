@@ -33,27 +33,10 @@
 
 - name: Download install packages
   get_url:
-    src: "{{ item.src }}"
+    url: "{{ item.src }}"
     checksum: "{{ item.cksum }}"
     dest: "{{ item.dest }}/{{ item.creates }}"
   with_items: "{{ downloads.irods }}"
-  ignore_errors: true
-  register: get_url_status
-
-- name: Install wget, if download failed
-  apt:
-     name: "wget"
-     update_cache: yes
-     cache_valid_time: 3600
-     state: installed
-  when: get_url_status.changed == false
-
-- name: wget iRODS package, if download failed
-  command: wget -N {{ item.src }} -P {{ item.dest }}
-  with_items: "{{ downloads.irods }}"
-  when: get_url_status.changed == false
-  tags:
-  - skip_ansible_lint #may require wget due to a bug with get_url
 
 - name: Install iRODS
   apt:
