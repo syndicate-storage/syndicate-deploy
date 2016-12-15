@@ -5,7 +5,7 @@
 ###Deploy to Docker
 
 ```
-$ ansible-playbook -i inventory/docker-demo-example docker-demo.yml
+$ ansible-playbook -i inventory/docker-demo-example docker-demo-playbook.yml
 ```
 
 ###Deploy to hardware (i.e. demo1 & demo2)
@@ -28,7 +28,7 @@ $ ansible-playbook -i inventory/demo-example demo-playbook.yml
 ##Perform Demo Tests
 
 * Login to the syndicate client test node (docker-synclient1) and run tests
- 
+
 ```
 docker exec -it docker-synclient1 bash
 su - syndicate
