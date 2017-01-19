@@ -1,0 +1,48 @@
+#!/bin/bash
+
+if [ $# -gt 0 ]; then 
+    sleeptime=$1
+else
+    sleeptime=0
+fi
+
+#overwrite autogen hosts file
+if [ -f /root/hosts ]; then
+   cp /root/hosts /etc/hosts
+fi
+
+#set hostname
+if [ -f /root/hostname ]; then
+    hostname `cat /root/hostname`
+fi
+
+#start syndicate-ms, if not already started and if on docker-demo1
+if [ -f /etc/init.d/syndicate-ms ] && [ `hostname` == "docker-demo1" ]; then
+    service syndicate-ms start
+fi
+
+#start hadoop-namenode
+if [ -f /etc/init.d/hadoop-namenode ]; then
+    service hadoop-namenode start
+fi
+#start hadoop-resourcemanager
+if [ -f /etc/init.d/hadoop-resourcemanager ]; then
+    service hadoop-resourcemanager start
+fi
+
+#this may need to be adjusted later if we decide to install hadoop datanode on a separate (from the namenode) demo system
+#start hadoop-datanode
+if [ -f /etc/init.d/hadoop-datanode ]; then
+    service hadoop-datanode start
+fi
+#start hadoop-nodemanager
+if [ -f /etc/init.d/hadoop-nodemanager ]; then
+    service hadoop-nodemanager start
+fi
+
+#start irods
+if [ -f /etc/init.d/irods ]; then
+    service irods start
+fi
+
+sleep $sleeptime

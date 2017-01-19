@@ -51,7 +51,7 @@
 - name: Copy /etc/hosts
   copy:
     src: /etc/hosts
-    dest: /tmp/hosts
+    dest: /root/hosts
     remote_src: true
 
 - name: Populate hosts from inventory
@@ -65,4 +65,7 @@
   with_items: "{{ groups['all'] }}"
 
 - name: Replace /etc/hosts
-  shell: "cat /tmp/hosts > /etc/hosts"
+  shell: "cat /root/hosts > /etc/hosts"
+
+- name: Save host name
+  shell: "echo {{ inventory_hostname }} > /root/hostname"

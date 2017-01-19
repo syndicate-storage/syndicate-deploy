@@ -6,7 +6,7 @@
 docker_preload_packages: false
 
 # The time which each docker container remains up/running
-docker_container_uptime: 7d
+docker_container_uptime: 365d
 
 # Specify the packages to pre-load
 irods3_packages: "'ant build-essential git odbc-postgresql openjdk-7-jdk postgresql-9.3 python-pika python-psycopg2 rabbitmq-server unixodbc-dev unzip uuid-dev uuid-runtime'"
