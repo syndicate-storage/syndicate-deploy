@@ -108,7 +108,7 @@
   when: "{{ enable_debugging | bool }}"
 
 - name: Make Fuse
-  shell: "./makeconf.sh && ./configure && make && make install"
+  shell: "export CFLAGS='-g' && ./makeconf.sh && ./configure && make && make install"
   args:
     chdir: /opt/downloads/libfuse-fuse_2_9_2
   when: "{{ enable_debugging | bool }}"
