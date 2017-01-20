@@ -55,12 +55,12 @@
     remote_src: true
 
 - name: Populate hosts from inventory
-  lineinfile: dest=/tmp/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{item}}" state=present
+  lineinfile: dest=/root/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{item}}" state=present
   when: hostvars[item].ansible_default_ipv4.address is defined
   with_items: "{{ groups['all'] }}"
 
 - name: Populate aliases from inventory
-  lineinfile: dest=/tmp/hosts regexp='.*{{ hostvars[item].alias }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{ hostvars[item].alias }}" state=present
+  lineinfile: dest=/root/hosts regexp='.*{{ hostvars[item].alias }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{ hostvars[item].alias }}" state=present
   when: hostvars[item].ansible_default_ipv4.address is defined and hostvars[item].alias is defined
   with_items: "{{ groups['all'] }}"
 
