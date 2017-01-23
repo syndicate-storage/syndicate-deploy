@@ -23,7 +23,7 @@ $ ansible-playbook -i inventory/demo-example demo-playbook.yml
 * "-e docker\_preload\_packages=\<true|false\>"
   - Only for Docker, tell docker to pre-load prerequisite iRODS packages to the docker image (saves time if you plan to run multiple iRODS install tests, default = "false")
 * "-e docker\_container\_uptime=\<time\>"
-  - Only for Docker, specify the time for the docker containers to remain up / running (default = "7d")
+  - Only for Docker, specify the time for the docker containers to remain up / running (default = "365d")
 
 ##Perform Demo Tests
 
@@ -33,6 +33,18 @@ $ ansible-playbook -i inventory/demo-example demo-playbook.yml
 docker exec -it docker-synclient1 bash
 su - syndicate
 cd syndicate-tests && ./testwrapper.sh
+```
+
+###Debugging with DDD in docker
+
+```
+docker exec -it docker-synclient1 bash
+ifconfig eth0   #get your docker IP, or use "docker inspect docker-synclient1" 
+service ssh start
+exit
+ssh -Y syndicate@<IP address of docker-synclient1>
+#edit test to include debug: ddd ...
+cd syndicate-tests && ./testwrapper.sh -n <test number>
 ```
 
 ## `jenkins-playbook.yml`
