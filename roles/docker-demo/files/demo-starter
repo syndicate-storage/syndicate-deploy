@@ -1,9 +1,12 @@
 #!/bin/bash
 
-if [ $# -gt 0 ]; then 
-    sleeptime=$1
-else
+if [ $# -eq 0 ]; then 
     sleeptime=0
+elif [ $# -eq 1 ]; then
+    sleeptime=$1
+elif [ $# -eq 2 ]; then
+    sleeptime=$1
+    hostname $2
 fi
 
 #overwrite autogen hosts file
