@@ -11,6 +11,7 @@
   with_items:
     - fuse
     - git
+    - graphviz
     - python-pip
     - valgrind
 
@@ -132,10 +133,14 @@
     chdir: /opt/downloads/syndicate-ug-tools
   when: "{{ enable_debugging | bool }}"
 
-- name: Install yaml from PyPi
+- name: Install yaml and magic from PyPi
   become: yes
   pip:
-    name: pyyaml
+    name: "{{ item }}"
+  with_items:
+    - gprof2dot
+    - pyyaml
+    - python-magic
 
 - name: Clone syndicate-tests repo
   git:
