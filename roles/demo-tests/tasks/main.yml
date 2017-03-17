@@ -12,6 +12,7 @@
     - fuse
     - git
     - graphviz
+    - oprofile
     - python-pip
     - valgrind
 
@@ -141,6 +142,7 @@
     - gprof2dot
     - pyyaml
     - python-magic
+    - subprocess32
 
 - name: Clone syndicate-tests repo
   git:
