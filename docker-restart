@@ -1,0 +1,14 @@
+#docker-restart
+#
+#docker-restart will restart your docker sessions that were previously stopped or killed and maintain the IP address it was originally assigned.
+
+dockerstatus=`docker ps -a | grep docker-`
+if [ -n "`echo $dockerstatus | grep Up`" ]; then
+    echo "Docker containers are already running, skipping restart"
+elif [ `echo "$dockerstatus" | wc -l` -eq 3 ]; then
+    docker cp docker-synclient1:/root/hosts .
+    docker start `cat hosts | grep docker | sort -n | awk '{ print $2 }'`
+    rm hosts
+else
+    echo "No docker containers were found"
+fi
