@@ -16,4 +16,4 @@ hadoop_pid_dir: /var/run/hadoop
 hdfs_lib_dir: /opt/hadoop/share/hadoop/hdfs/lib
 
 # H-Syndicate
-ug_port: 8888
+rest_port: 38888

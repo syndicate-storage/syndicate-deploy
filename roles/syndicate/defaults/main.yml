@@ -8,3 +8,7 @@ dl_dir: /opt/downloads
 syndicate_rest_server_home: "/opt/syndicate_ug_http"
 syndicate_user: syndicate
 syndicate_password: syndicate
+rest_port: 38888
+
+# Syndicate MS
+syndicate_ms_url: "http://demo1.opencloud.cs.arizona.edu:28080"
