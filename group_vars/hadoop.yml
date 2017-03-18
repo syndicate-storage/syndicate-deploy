@@ -4,7 +4,7 @@
 allowed_local_tcp_ports:
   - "8020:8090"
   # for Syndicate-REST
-  - 8888
+  - 38888
   - "9000:9001"
   - 13562
   - 19888
