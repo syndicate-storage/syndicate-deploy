@@ -50,6 +50,7 @@
   user:
     name: "{{ syndicate_user }}"
     password: "{{ syndicate_password | password_hash('sha512') }}"
+    shell: /bin/bash
 
 - name: Add syndicate user to sudoers
   lineinfile:
@@ -57,6 +58,17 @@
     state: present
     regexp: "^%{{ syndicate_user }}"
     line: "%{{ syndicate_user }} ALL=(ALL) NOPASSWD: ALL"
+
+- name: Copy syndicate user startup and env configuration
+  copy:
+    src: "{{ item }}"
+    dest: "/home/{{ syndicate_user }}"
+    owner: "syndicate"
+    group: "syndicate"
+    mode: "0755"
+  with_items:
+    - .inputrc
+    - .vimrc
 
 - name: Make dl_dir
   file:
