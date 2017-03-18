@@ -1,0 +1,10 @@
+---
+# syndicate/defaults/main.yml
+
+# Download defaults
+dl_dir: /opt/downloads
+
+# Syndicate REST server
+syndicate_rest_server_home: "/opt/syndicate_ug_http"
+syndicate_user: syndicate
+syndicate_password: syndicate
