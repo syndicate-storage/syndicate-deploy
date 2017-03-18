@@ -92,7 +92,7 @@
 # get_url caused ssl validation error
 # switch to curl
 - name: Add apt repo for nodesource
-  shell: "curl -sL https://deb.nodesource.com/setup | bash -"
+  shell: "curl -sL https://deb.nodesource.com/setup_6.x | bash -"
   when: not node_binary.stat.exists
 
 - name: Install Node.js packages which are used by syndicate-node binding
