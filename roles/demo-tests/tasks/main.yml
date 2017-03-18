@@ -11,6 +11,8 @@
   with_items:
     - fuse
     - git
+    - graphviz
+    - oprofile
     - python-pip
     - valgrind
 
@@ -108,7 +110,7 @@
   when: "{{ enable_debugging | bool }}"
 
 - name: Make Fuse
-  shell: "./makeconf.sh && ./configure && make && make install"
+  shell: "export CFLAGS='-g' && ./makeconf.sh && ./configure && make && make install"
   args:
     chdir: /opt/downloads/libfuse-fuse_2_9_2
   when: "{{ enable_debugging | bool }}"
@@ -132,10 +134,15 @@
     chdir: /opt/downloads/syndicate-ug-tools
   when: "{{ enable_debugging | bool }}"
 
-- name: Install yaml from PyPi
+- name: Install yaml and magic from PyPi
   become: yes
   pip:
-    name: pyyaml
+    name: "{{ item }}"
+  with_items:
+    - gprof2dot
+    - pyyaml
+    - python-magic
+    - subprocess32
 
 - name: Clone syndicate-tests repo
   git:

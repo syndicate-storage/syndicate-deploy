@@ -37,5 +37,5 @@
     devices: "/dev/fuse:/dev/fuse:rwm"
     cap_add: SYS_ADMIN
     privileged: yes
-    command: "sleep {{ docker_container_uptime }}"
+    command: "/usr/local/bin/demo-starter {{ docker_container_uptime }} {{ inventory_hostname }}"
   when: docker_running.changed == false or docker_running.stdout.find("demo") == -1
