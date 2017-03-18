@@ -125,16 +125,22 @@
     dest: "{{ dl_dir }}/syndicate-ug-http.zip"
   register: syndicate_ug_http_dl
 
-- name: Ensure syndicate_rest_server_home exists
+- name: Make temporary directory
   file:
     path: "{{ syndicate_rest_server_home }}_temp"
     state: directory
+  when: syndicate_ug_http_dl.changed
 
 # ansible unarchive fails when using strip-components, known bug.
 - name: Uncompress Syndicate REST server
   shell: "unzip {{ syndicate_ug_http_dl.dest }} -d {{ syndicate_rest_server_home }}_temp && 
-    mv {{ syndicate_rest_server_home }}_temp/syndicate-ug-http-master {{ syndicate_rest_server_home }} &&
-    rmdir {{ syndicate_rest_server_home }}_temp"
+    mv {{ syndicate_rest_server_home }}_temp/syndicate-ug-http-master {{ syndicate_rest_server_home }}"
+  when: syndicate_ug_http_dl.changed
+
+- name: Remove temporary directory
+  file:
+    path: "{{ syndicate_rest_server_home }}_temp"
+    state: absent
   when: syndicate_ug_http_dl.changed
 
 - name: Chmod/chown syndicate_rest_server_home
