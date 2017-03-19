@@ -1,0 +1,9 @@
+{
+    "ms_url": "{{ syndicate_ms_url }}",
+    "service_hosts": [
+    {% for host in groups['hadoop'] %}
+        "{{ host }}",
+    {% endfor %}
+    ],
+    "service_port": {{ rest_port }}
+}

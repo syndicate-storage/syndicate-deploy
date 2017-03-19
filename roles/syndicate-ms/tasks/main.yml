@@ -160,9 +160,9 @@
   template:
     src: "{{ item }}.j2"
     dest: "/etc/profile.d/{{ item }}"
-    owner: root
-    group: root
-    mode: 0755
+    owner: "root"
+    group: "root"
+    mode: "0755"
   with_items:
     - gae.sh
 

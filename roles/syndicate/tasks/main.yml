@@ -143,6 +143,27 @@
     state: absent
   when: syndicate_ug_http_dl.changed
 
+- name: Copy over Syndicate REST CLI configurations
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ syndicate_rest_server_home }}/cli/{{ item }}"
+    owner: "{{ syndicate_user }}"
+    group: "{{ syndicate_user }}"
+    mode: "0755"
+  with_items:
+    - client_config.json
+
+- name: Copy over Syndicate REST server configurations
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ syndicate_rest_server_home }}/server/{{ item }}"
+    owner: "{{ syndicate_user }}"
+    group: "{{ syndicate_user }}"
+    mode: "0755"
+  with_items:
+    - server_config.json
+    - whitelist
+
 - name: Chmod/chown syndicate_rest_server_home
   file:
     path: "{{ syndicate_rest_server_home }}"
