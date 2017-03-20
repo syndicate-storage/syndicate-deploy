@@ -92,7 +92,7 @@
 # get_url caused ssl validation error
 # switch to curl
 - name: Add apt repo for nodesource
-  shell: "curl -sL https://deb.nodesource.com/setup | bash -"
+  shell: "curl -sL https://deb.nodesource.com/setup_6.x | bash -"
   when: not node_binary.stat.exists
 
 - name: Install Node.js packages which are used by syndicate-node binding
@@ -125,17 +125,44 @@
     dest: "{{ dl_dir }}/syndicate-ug-http.zip"
   register: syndicate_ug_http_dl
 
-- name: Ensure syndicate_rest_server_home exists
+- name: Make temporary directory
   file:
     path: "{{ syndicate_rest_server_home }}_temp"
     state: directory
+  when: syndicate_ug_http_dl.changed
 
 # ansible unarchive fails when using strip-components, known bug.
 - name: Uncompress Syndicate REST server
   shell: "unzip {{ syndicate_ug_http_dl.dest }} -d {{ syndicate_rest_server_home }}_temp && 
-    mv {{ syndicate_rest_server_home }}_temp/syndicate-ug-http-master {{ syndicate_rest_server_home }} &&
-    rmdir {{ syndicate_rest_server_home }}_temp"
+    mv {{ syndicate_rest_server_home }}_temp/syndicate-ug-http-master {{ syndicate_rest_server_home }}"
   when: syndicate_ug_http_dl.changed
+
+- name: Remove temporary directory
+  file:
+    path: "{{ syndicate_rest_server_home }}_temp"
+    state: absent
+  when: syndicate_ug_http_dl.changed
+
+- name: Copy over Syndicate REST CLI configurations
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ syndicate_rest_server_home }}/cli/{{ item }}"
+    owner: "{{ syndicate_user }}"
+    group: "{{ syndicate_user }}"
+    mode: "0755"
+  with_items:
+    - client_config.json
+
+- name: Copy over Syndicate REST server configurations
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ syndicate_rest_server_home }}/server/{{ item }}"
+    owner: "{{ syndicate_user }}"
+    group: "{{ syndicate_user }}"
+    mode: "0755"
+  with_items:
+    - server_config.json
+    - whitelist
 
 - name: Chmod/chown syndicate_rest_server_home
   file:
