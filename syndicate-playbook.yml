@@ -1,0 +1,10 @@
+---
+# Install syndicate
+
+- hosts: hadoop
+  become: yes
+  roles:
+    - common-prep
+    - ssh-lockdown
+    - ufw
+    - syndicate
