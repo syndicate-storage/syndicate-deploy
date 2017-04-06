@@ -89,6 +89,8 @@
       dest: /opt/downloads/syndicate-core
     - src: https://github.com/jcnelson/fskit
       dest: /opt/downloads/fskit
+    - src: https://github.com/syndicate-storage/syndicate-automount
+      dest: /opt/downloads/syndicate-automount
   when: "{{ enable_debugging | bool }}"
 
 - name: Download sources
