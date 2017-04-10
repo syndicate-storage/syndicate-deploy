@@ -1,0 +1,11 @@
+---
+# Install syndicate-ug-http
+
+- hosts: hadoop
+  become: yes
+  roles:
+    - common-prep
+    - ssh-lockdown
+    - ufw
+    - syndicate
+    - syndicate-ug-http

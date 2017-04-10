@@ -6,10 +6,11 @@ dl_dir: /opt/downloads
 
 # Syndicate REST server
 syndicate_rest_server_home: "/opt/syndicate_ug_http"
+syndicate_rest_data_path: "/opt/syndicate_ug_http_data"
 syndicate_user: syndicate
 syndicate_password: syndicate
 rest_port: 38888
-rest_data_path: "/opt/syndicate_ug_http_data"
+
 
 # Syndicate MS
 syndicate_ms_url: "http://demo1.opencloud.cs.arizona.edu:28080"
