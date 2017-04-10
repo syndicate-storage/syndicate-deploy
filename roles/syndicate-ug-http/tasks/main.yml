@@ -1,0 +1,140 @@
+---
+# syndicate-ug-http/tasks/main.yml
+# Installs syndicate-ug-http packages
+
+- name: Utilities
+  become: yes
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: installed
+  with_items:
+    - curl
+    - daemon
+    - make
+    - unzip
+
+- name: Create syndicate user
+  user:
+    name: "{{ syndicate_user }}"
+    password: "{{ syndicate_password | password_hash('sha512') }}"
+    shell: /bin/bash
+
+- name: Add syndicate user to sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: "^%{{ syndicate_user }}"
+    line: "%{{ syndicate_user }} ALL=(ALL) NOPASSWD: ALL"
+
+- name: Copy syndicate user startup and env configuration
+  copy:
+    src: "{{ item }}"
+    dest: "/home/{{ syndicate_user }}"
+    owner: "syndicate"
+    group: "syndicate"
+    mode: "0755"
+  with_items:
+    - .inputrc
+    - .vimrc
+
+- name: Check if node is installed
+  stat:
+    path: "/usr/bin/node"
+  register: node_binary
+
+# get_url caused ssl validation error
+# switch to curl
+- name: Add apt repo for nodesource
+  shell: "curl -sL https://deb.nodesource.com/setup_6.x | bash -"
+  when: not node_binary.stat.exists
+
+- name: Install Node.js packages which are used by syndicate-node binding
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: present
+  with_items:
+    - nodejs
+  when: not node_binary.stat.exists
+
+- name: Install Syndicate node binding
+  npm:
+    name: "{{ item }}"
+    global: yes
+    state: present
+  with_items:
+    - syndicate-drive
+    - syndicate-drive-ug-tools
+
+- name: Make dl_dir
+  file:
+    path: "{{ dl_dir }}"
+    state: directory
+
+- name: Download Syndicate REST server from github
+  get_url:
+    url: "https://github.com/syndicate-storage/syndicate-ug-http/archive/master.zip"
+    dest: "{{ dl_dir }}/syndicate-ug-http.zip"
+  register: syndicate_ug_http_dl
+
+- name: Make temporary directory
+  file:
+    path: "{{ syndicate_rest_server_home }}_temp"
+    state: directory
+  when: syndicate_ug_http_dl.changed
+
+# ansible unarchive fails when using strip-components, known bug.
+- name: Uncompress Syndicate REST server
+  shell: "unzip {{ syndicate_ug_http_dl.dest }} -d {{ syndicate_rest_server_home }}_temp && 
+    mv {{ syndicate_rest_server_home }}_temp/syndicate-ug-http-master {{ syndicate_rest_server_home }}"
+  when: syndicate_ug_http_dl.changed
+
+- name: Remove temporary directory
+  file:
+    path: "{{ syndicate_rest_server_home }}_temp"
+    state: absent
+  when: syndicate_ug_http_dl.changed
+
+- name: Copy over Syndicate REST CLI configurations
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ syndicate_rest_server_home }}/cli/{{ item }}"
+    owner: "{{ syndicate_user }}"
+    group: "{{ syndicate_user }}"
+    mode: "0755"
+  with_items:
+    - client_config.json
+
+- name: Copy over Syndicate REST server configurations
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ syndicate_rest_server_home }}/server/{{ item }}"
+    owner: "{{ syndicate_user }}"
+    group: "{{ syndicate_user }}"
+    mode: "0755"
+  with_items:
+    - server_config.json
+    - whitelist
+
+- name: Chmod/chown syndicate_rest_server_home
+  file:
+    path: "{{ item }}"
+    owner: "{{ syndicate_user }}"
+    group: "{{ syndicate_user }}"
+    mode: "u=rwx,g=rx,o=rx"
+    state: directory
+    recurse: yes
+  with_items:
+    - "{{ syndicate_rest_server_home }}"
+    - "{{ syndicate_rest_data_path }}"
+
+- name: Install Syndicate REST server
+  npm:
+    path: "{{ item }}"
+    global: no
+    state: present
+  with_items:
+    - "{{ syndicate_rest_server_home }}/server"
