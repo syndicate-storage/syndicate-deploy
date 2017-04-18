@@ -10,10 +10,10 @@
 - name: Register if a reboot is required
   stat:
     path: /var/run/reboot-required
-  register: reboot-required
+  register: reboot_required
 
 - name: Reboot if required
-  when: reboot-required.exists is defined
+  when: reboot_required.exists is defined
   debug:
     msg: "System will reboot"
   notify:
