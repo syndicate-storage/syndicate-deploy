@@ -196,7 +196,7 @@
 
 - name: Check syndicate tool setup failure conditions
   fail: msg="syndicate tool failed to configure"
-  failed_when: "syncommand_result|failed and 'already set up' not in syncommand_result.stderr and syncommand_result.stderr != ''" #fails if previously configured or has no stderr
+  failed_when: "syncommand_result|failed and 'already set up' not in syncommand_result.stderr and 'Failed to obtain syndicate public key' not in syncommand_result.stderr and syncommand_result.stderr != ''" #fail if has error other than 'already set up' or 'Failed to obtain syndicate public key'
 
 - name: Save syndicate certs for demo-tests
   fetch:
