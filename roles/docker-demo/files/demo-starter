@@ -48,4 +48,9 @@ if [ -f /etc/init.d/irods ]; then
     service irods start
 fi
 
+#start ssh on docker-synclient1, this allows X11 capabilities
+if [ `hostname` == "docker-synclient1" ]; then
+    service ssh start
+fi
+
 sleep $sleeptime

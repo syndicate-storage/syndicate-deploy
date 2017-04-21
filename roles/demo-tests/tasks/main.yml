@@ -50,10 +50,17 @@
     - automake
   when: enable_debugging|bool
 
-- name: Restart sshd to enable remote X11 use
+- name: Adjust sshd behavior
+  lineinfile:
+    dest: /etc/default/ssh
+    state: present
+    regexp: "SSHD_OPTS.*"
+    line: 'SSHD_OPTS=-4'
+
+- name: Start sshd to enable remote X11 use
   service:
     name: ssh
-    state: restarted
+    state: started
 
 - name: Syndicate build dependencies
   become: yes
