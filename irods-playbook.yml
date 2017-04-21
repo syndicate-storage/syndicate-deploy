@@ -14,5 +14,5 @@
     - common-prep
     - ssh-lockdown
     - ufw
-    - { role: irods3, when: "{{ irods_version | int }} == 3" }
-    - { role: irods4, when: "{{ irods_version | int }} == 4" }
+    - { role: irods3, when: irods_version|int == 3 }
+    - { role: irods4, when: irods_version|int == 4 }

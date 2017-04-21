@@ -48,7 +48,7 @@
     - libtool
     - gettext
     - automake
-  when: "{{ enable_debugging | bool }}"
+  when: enable_debugging|bool
 
 - name: Restart sshd to enable remote X11 use
   service:
@@ -67,14 +67,14 @@
     - cython
     - protobuf-compiler
     - libattr1-dev
-    - libcurl4-openssl-dev  
-    - libfuse-dev  
+    - libcurl4-openssl-dev
+    - libfuse-dev
     - libjson0
     - libjson0-dev
     - libmicrohttpd-dev
     - libprotobuf-dev
     - libssl-dev
-  when: "{{ enable_debugging | bool }}"
+  when: enable_debugging|bool
 
 - name: Clone syndicate repos
   git:
@@ -91,7 +91,7 @@
       dest: /opt/downloads/fskit
     - src: https://github.com/syndicate-storage/syndicate-automount
       dest: /opt/downloads/syndicate-automount
-  when: "{{ enable_debugging | bool }}"
+  when: enable_debugging|bool
 
 - name: Download sources
   get_url:
@@ -102,39 +102,39 @@
     - url: "https://github.com/libfuse/libfuse/archive/fuse_2_9_2.tar.gz"
       cksum: "sha256:b8c035bb8becb9ae1374f16a13c13b66f05e199eb42c7f97f4efdff9bc46657c"
       dest: "{{ dl_dir }}/fuse_2_9_2.tar.gz"
-  when: "{{ enable_debugging | bool }}"
+  when: enable_debugging|bool
 
 - name: Uncompress Fuse
   unarchive:
     src: "{{ dl_dir }}/fuse_2_9_2.tar.gz"
     dest: "{{ dl_dir }}"
     copy: no
-  when: "{{ enable_debugging | bool }}"
+  when: enable_debugging|bool
 
 - name: Make Fuse
   shell: "export CFLAGS='-g' && ./makeconf.sh && ./configure && make && make install"
   args:
     chdir: /opt/downloads/libfuse-fuse_2_9_2
-  when: "{{ enable_debugging | bool }}"
+  when: enable_debugging|bool
 
 - name: Make fskit
   shell: "make && make install PREFIX=/usr"
   args:
     chdir: /opt/downloads/fskit
-  when: "{{ enable_debugging | bool }}"
+  when: enable_debugging|bool
 #    creates: "{{ ms_path }}/app.yaml"
 
 - name: Make syndicate
   shell: "make all && make install PREFIX=/usr"
   args:
     chdir: /opt/downloads/syndicate-core
-  when: "{{ enable_debugging | bool }}"
+  when: enable_debugging|bool
 
 - name: Make syndicate-ug-tools
   shell: "make all && make install PREFIX=/usr"
   args:
     chdir: /opt/downloads/syndicate-ug-tools
-  when: "{{ enable_debugging | bool }}"
+  when: enable_debugging|bool
 
 - name: Install yaml and magic from PyPi
   become: yes

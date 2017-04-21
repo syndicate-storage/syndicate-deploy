@@ -88,7 +88,7 @@
 
 # ansible unarchive fails when using strip-components, known bug.
 - name: Uncompress Syndicate REST server
-  shell: "unzip {{ syndicate_ug_http_dl.dest }} -d {{ syndicate_rest_server_home }}_temp && 
+  shell: "unzip {{ syndicate_ug_http_dl.dest }} -d {{ syndicate_rest_server_home }}_temp &&
     mv {{ syndicate_rest_server_home }}_temp/syndicate-ug-http-master {{ syndicate_rest_server_home }}"
   when: syndicate_ug_http_dl.changed
 

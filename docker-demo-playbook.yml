@@ -30,9 +30,9 @@
 #  connection: docker
 #  become: yes
 #  roles:
-#    - { role: irods3, when: "{{ irods_version | int }} == 3" }
-#    - { role: irods4, when: "{{ irods_version | int }} == 4" }
-#
+#    - { role: irods3, when: irods_version|int == 3 }
+#    - { role: irods4, when: irods_version|int == 4 }
+
 #- name: Install Hadoop
 #  hosts: hadoop
 #  connection: docker
