@@ -215,6 +215,15 @@
     - src: /opt/output
       dest: /home/syndicate/output
 
+- name: Create additional test users
+  user:
+    name: "{{ item }}"
+    password: "{{ item | password_hash('sha512') }}"
+    shell: /bin/bash
+  with_items:
+    - testuser1
+    - testuser2
+
 - name: Adjust syndicate-tests port config
   lineinfile:
     dest: /opt/syndicate-tests/config.sh
