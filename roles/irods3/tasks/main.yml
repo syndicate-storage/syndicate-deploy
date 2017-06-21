@@ -38,14 +38,19 @@
     name: "{{ item }}"
     state: started
     enabled: yes
-  with_items: "{{ prereq_enable_services }}"
+  with_items:
+    - postgresql
+    - rabbitmq-server
 
 - name: Download and uncompress install zip files
   unarchive:
-    src: "{{ item.value.src }}"
+    src: "{{ item }}"
     dest: "{{ dl_dir }}"
     copy: no   #the "copy" option will be depricated but this doesn't work with it's replacement ("remote_src"), so this will fail in the future
-  with_dict: "{{ downloads }}"
+  with_items:
+    - 'https://github.com/irods/irods-legacy/archive/3.3.1.zip'
+    - 'https://github.com/cyverse/irods-setavu-mod/archive/master.zip'
+    - 'https://github.com/iychoi/iPlantBorderMessageServer/archive/master.zip'
 
 - name: Check if iRODS has already been installed
   stat:
@@ -53,31 +58,31 @@
   register: irodspath_stat
 
 - name: Install iRODS
-  command: "cp -r {{ dl_dir }}/{{ downloads.irods.creates }} {{ config_irods_path }}"
+  command: "cp -r {{ dl_dir }}/irods-legacy-3.3.1 {{ config_irods_path }}"
   when: irodspath_stat.stat.exists == False
-
-- name: Create required directories
-  file:
-    path: "{{ item.value.dest|dirname }}"
-    state: directory
-  with_dict: "{{ downloads }}"
 
 - name: Check if setAVU has already been installed
   stat:
-    path: "{{ downloads.setavu.dest }}"
+    path: '{{ config_irods_path }}/iRODS/modules/setavu'
   register: setavupath_stat
 
+- name: Create setAVU path
+  file:
+    path: "{{ config_irods_path }}/iRODS/modules"
+    state: directory
+  when: setavupath_stat.stat.exists == False
+
 - name: Install Cyverse setAVU module
-  command: "cp -r {{ dl_dir }}/{{ downloads.setavu.creates }} {{ downloads.setavu.dest }}"
+  command: "cp -r {{ dl_dir }}/irods-setavu-mod-master {{ config_irods_path }}/iRODS/modules/setavu"
   when: setavupath_stat.stat.exists == False
 
 - name: Check if BMS has already been installed
   stat:
-    path: "{{ downloads.bms.dest }}"
+    path: "{{ config_irods_path }}/bms"
   register: bmspath_stat
 
 - name: Install bms
-  command: "cp -r {{ dl_dir }}/{{ downloads.bms.creates }} {{ downloads.bms.dest }}"
+  command: "cp -r {{ dl_dir }}/iPlantBorderMessageServer-master {{ config_irods_path }}/bms"
   when: bmspath_stat.stat.exists == False
 
 - name: Copy iRODS rules and command scripts
