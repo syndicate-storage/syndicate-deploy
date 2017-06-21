@@ -71,4 +71,4 @@
   shell: "echo {{ inventory_hostname }} > /root/hostname"
 
 - name: Set host name
-  cmd: "hostname {{ inventory_hostname }}"
+  command: "hostname {{ inventory_hostname }}"
